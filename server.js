@@ -14,6 +14,7 @@ import { onRequest as searchHandler } from "./functions/api/search.js";
 import { onRequest as videoHandler } from "./functions/api/video.js";
 import { onRequest as downloadHandler } from "./functions/api/download.js";
 import { onRequest as proxyHandler } from "./functions/api/proxy.js";
+import { onRequest as healthHandler } from "./functions/api/health.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +29,8 @@ const HANDLERS = {
   "/api/discover": searchHandler,
   "/api/video": videoHandler,
   "/api/download": downloadHandler,
-  "/api/proxy": proxyHandler
+  "/api/proxy": proxyHandler,
+  "/api/health": healthHandler
 };
 
 // In-memory cache cho static files để tăng tốc độ phản hồi <1ms

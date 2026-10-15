@@ -1220,8 +1220,9 @@
         `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-slate-300 border border-slate-700">${t}</span>`
       ).join("");
 
+      const seriesId = item.series_id || item.book_id || item.id || "";
       return `
-        <div onclick="openSeriesById('${item.series_id}')" class="group cursor-pointer bg-slate-900/90 border border-slate-800 hover:border-rose-500/60 rounded-xl overflow-hidden flex flex-col justify-between transition-all hover:-translate-y-1 shadow-lg">
+        <div onclick="openSeriesById('${seriesId}')" class="group cursor-pointer bg-slate-900/90 border border-slate-800 hover:border-rose-500/60 rounded-xl overflow-hidden flex flex-col justify-between transition-all hover:-translate-y-1 shadow-lg">
           <div>
             <div class="relative aspect-[3/4] bg-slate-800 overflow-hidden">
               <img src="${proxyImg(item.cover)}" referrerpolicy="no-referrer" alt="${safeTitle}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="handleImgError(this, '${safeCover}')" />

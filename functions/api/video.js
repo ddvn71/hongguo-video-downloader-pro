@@ -80,8 +80,8 @@ export async function onRequest(context) {
   const targetUrl = urlObj.searchParams.get("url");
   const keyHex = (urlObj.searchParams.get("key") || "").trim();
 
-  if (!targetUrl) {
-    return new Response("Missing target url parameter", { status: 400 });
+  if (!targetUrl || (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://"))) {
+    return new Response("Missing or invalid target url parameter", { status: 400 });
   }
 
   try {

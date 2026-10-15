@@ -26,8 +26,8 @@ export async function onRequest(context) {
   const keyHex = (urlObj.searchParams.get("key") || "").trim();
   const rawMode = urlObj.searchParams.get("raw") === "1"; // Cho phép trình duyệt tải raw bytes để tự giải mã bằng WebCrypto ở Client
 
-  if (!targetUrl) {
-    return new Response("Missing target url parameter", { status: 400 });
+  if (!targetUrl || (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://"))) {
+    return new Response("Missing or invalid target url parameter", { status: 400 });
   }
 
   const safeFilename = encodeURIComponent(filename.replace(/[\\/:*?"<>|]/g, "_"));

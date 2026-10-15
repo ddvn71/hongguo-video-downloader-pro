@@ -21,6 +21,7 @@ function attachUrlsToStream(streamData, title = "hongguo_drama", epIndex = 1) {
 
 export async function onRequest(context) {
   const { request } = context;
+  const tStart = Date.now();
 
   if (request.method === "OPTIONS") {
     return new Response(null, {
@@ -80,6 +81,7 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({
         success: true,
         mode: "batch",
+        latency_ms: Date.now() - tStart,
         count: Object.keys(outMap).length,
         data_map: outMap
       }), {
@@ -107,6 +109,7 @@ export async function onRequest(context) {
 
     return new Response(JSON.stringify({
       success: true,
+      latency_ms: Date.now() - tStart,
       data: streamData
     }), {
       status: 200,
