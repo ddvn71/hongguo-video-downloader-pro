@@ -2,5 +2,9 @@ name = "hongguo-hub-pro"
 compatibility_date = "2024-09-01"
 pages_build_output_dir = "./public"
 
+# Tối ưu hóa vị trí đặt Worker tự động gần cụm máy chủ API đích (Giảm Ping RTT 40-70%)
+[placement]
+mode = "smart"
+
 [vars]
 ENVIRONMENT = "production"

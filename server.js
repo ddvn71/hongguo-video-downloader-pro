@@ -119,25 +119,44 @@ const server = http.createServer(async (req, res) => {
     ".ico": "image/x-icon"
   };
 
-  const serveContent = (content, contentType) => {
-    const acceptEncoding = String(req.headers["accept-encoding"] || "");
-    const compressible = /\.(html|js|css|json|xml|svg|txt)$/i.test(ext || ".html");
-    if (compressible && acceptEncoding.includes("gzip") && content.length > 1024) {
+  const acceptEncoding = String(req.headers["accept-encoding"] || "");
+  const wantGzip = acceptEncoding.includes("gzip") && /\.(html|js|css|json|xml|svg|txt)$/i.test(ext || ".html");
+  const cacheKey = `${filePath}:${wantGzip ? "gz" : "raw"}`;
+
+  if (staticCache.has(cacheKey)) {
+    const entry = staticCache.get(cacheKey);
+    res.writeHead(200, entry.headers);
+    res.end(entry.body);
+    return;
+  }
+
+  const serveContent = (resolvedPath, content, contentType) => {
+    const key = `${resolvedPath}:${wantGzip ? "gz" : "raw"}`;
+    if (wantGzip && content.length > 1024) {
       zlib.gzip(content, (gzErr, gzBuf) => {
         if (!gzErr) {
-          res.writeHead(200, {
+          const headers = {
             "Content-Type": contentType,
             "Content-Encoding": "gzip",
-            "Vary": "Accept-Encoding"
-          });
+            "Vary": "Accept-Encoding",
+            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400"
+          };
+          staticCache.set(key, { headers, body: gzBuf });
+          res.writeHead(200, headers);
           res.end(gzBuf);
         } else {
-          res.writeHead(200, { "Content-Type": contentType });
+          const headers = { "Content-Type": contentType };
+          res.writeHead(200, headers);
           res.end(content);
         }
       });
     } else {
-      res.writeHead(200, { "Content-Type": contentType });
+      const headers = {
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400"
+      };
+      staticCache.set(key, { headers, body: content });
+      res.writeHead(200, headers);
       res.end(content);
     }
   };
@@ -145,12 +164,13 @@ const server = http.createServer(async (req, res) => {
   fs.readFile(filePath, (err, content) => {
     if (err) {
       if (err.code === "ENOENT") {
-        fs.readFile(path.join(PUBLIC_DIR, "index.html"), (err2, content2) => {
+        const fallbackPath = path.join(PUBLIC_DIR, "index.html");
+        fs.readFile(fallbackPath, (err2, content2) => {
           if (err2) {
             res.writeHead(404);
             res.end("404 Not Found");
           } else {
-            serveContent(content2, "text/html; charset=utf-8");
+            serveContent(fallbackPath, content2, "text/html; charset=utf-8");
           }
         });
       } else {
@@ -158,7 +178,7 @@ const server = http.createServer(async (req, res) => {
         res.end(`Server Error: ${err.code}`);
       }
     } else {
-      serveContent(content, mimeTypes[ext] || "application/octet-stream");
+      serveContent(filePath, content, mimeTypes[ext] || "application/octet-stream");
     }
   });
 });

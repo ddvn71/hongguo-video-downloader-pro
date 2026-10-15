@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "include": [
+    "/api/*"
+  ],
+  "exclude": [
+    "/",
+    "/index.html",
+    "/articles.js",
+    "/favicon.svg",
+    "/ads.txt",
+    "/robots.txt",
+    "/sitemap.xml"
+  ]
+}

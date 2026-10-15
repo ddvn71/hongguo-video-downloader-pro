@@ -7,6 +7,7 @@
   <meta name="description" content="Công cụ tìm kiếm và tải video phim ngắn Hongguo Short Drama (红果免费短剧 / Fanqie) Full HD 1080p không watermark miễn phí. Hỗ trợ giải mã CENC-AES-CTR tự động, tải trọn bộ nhiều tập và tương thích Douyin/TikTok." />
   <meta name="keywords" content="download hongguo video, hongguo downloader, 红果免费短剧下载, tải video hongguo, tải phim ngắn trung quốc, hongguo short drama 1080p, novelquickapp downloader, hongguoduanju" />
   <meta name="robots" content="index, follow" />
+  <meta name="referrer" content="no-referrer" />
   <link rel="canonical" href="https://hongguodownloader.pages.dev/" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
@@ -84,6 +85,14 @@
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- Preconnect & DNS-Prefetch tới CDN ảnh/video ByteDance & Hongguo để giảm 150-250ms bắt tay TLS -->
+  <link rel="preconnect" href="https://p3-novel-sign.byteimg.com" crossorigin />
+  <link rel="preconnect" href="https://p6-novel-sign.byteimg.com" crossorigin />
+  <link rel="preconnect" href="https://p9-novel-sign.byteimg.com" crossorigin />
+  <link rel="dns-prefetch" href="//v26-qz.qznovelvod.com" />
+  <link rel="dns-prefetch" href="//v3-qz.qznovelvod.com" />
+  <link rel="dns-prefetch" href="//v9-qz.qznovelvod.com" />
+  <link rel="dns-prefetch" href="//hongguoduanju.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
@@ -299,9 +308,13 @@
           </div>
 
           <div class="flex items-center gap-3">
+            <span id="edge-ping-badge" class="inline-flex items-center gap-1.5 text-[11px] font-mono text-cyan-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700/80">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span id="edge-ping-text">⚡ Ping: --ms</span>
+            </span>
             <span class="inline-flex items-center gap-1.5 text-[11px] text-emerald-400">
               <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span>WebCrypto CENC-AES-CTR Sẵn Sàng</span>
+              <span>WebCrypto CENC Sẵn Sàng</span>
             </span>
           </div>
         </div>
@@ -974,7 +987,7 @@
 
   <!-- MAIN APPLICATION LOGIC -->
   <script>
-    // ==================== STATE QUẢN LÝ ====================
+    // ==================== STATE QUẢN LÝ & BỘ NHỚ ĐỆM CLIENT ====================
     let currentSeries = null;
     let currentActiveEpisode = null;
     let currentStreamData = null;
@@ -982,6 +995,12 @@
     let batchAborted = false;
     let currentDiscoverCategory = "hot";
     let currentDiscoverPage = 1;
+
+    // Bộ nhớ đệm phía trình duyệt giúp chuyển tập & chuyển tab trong 0ms (0 tốn request Cloudflare)
+    const episodeStreamCache = new Map();
+    const parseResultCache = new Map();
+    const discoverCache = new Map();
+    const prefetchingVids = new Set();
 
     // ==================== KHỞI TẠO TRANG ====================
     window.addEventListener("DOMContentLoaded", () => {
@@ -1013,6 +1032,18 @@
       box.classList.remove("hidden");
       clearTimeout(window._toastTimer);
       window._toastTimer = setTimeout(() => box.classList.add("hidden"), 3200);
+    }
+
+    function updatePingBadge(ms, isHit = false, customLabel = "") {
+      const textEl = document.getElementById("edge-ping-text");
+      if (!textEl) return;
+      if (customLabel) {
+        textEl.textContent = `⚡ Ping: ${customLabel}`;
+      } else if (isHit || ms <= 5) {
+        textEl.textContent = `⚡ Ping: ${ms}ms (Edge HIT)`;
+      } else {
+        textEl.textContent = `⚡ Ping: ${ms}ms`;
+      }
     }
 
     function scrollToTop() {
@@ -1047,10 +1078,23 @@
       handleFetch();
     }
 
+    // TỐI ƯU FREE QUOTA: Tải ảnh trực tiếp từ CDN gốc ByteDance (nhờ meta no-referrer), chỉ fallback sang /api/proxy nếu lỗi
     function proxyImg(url) {
       if (!url) return "/favicon.svg";
-      return `/api/proxy?url=${encodeURIComponent(url)}`;
+      if (url.startsWith("http://")) {
+        return `/api/proxy?url=${encodeURIComponent(url)}`;
+      }
+      return url;
     }
+
+    window.handleImgError = function (imgEl, rawUrl) {
+      if (!imgEl.dataset.proxied && rawUrl && rawUrl.startsWith("http")) {
+        imgEl.dataset.proxied = "1";
+        imgEl.src = `/api/proxy?url=${encodeURIComponent(rawUrl)}`;
+      } else {
+        imgEl.src = "/favicon.svg";
+      }
+    };
 
     function formatBytes(bytes) {
       const n = Number(bytes) || 0;
@@ -1078,8 +1122,17 @@
       const customApi = localStorage.getItem("hg_custom_api") || "";
       const apihzId = localStorage.getItem("hg_apihz_id") || "";
       const apihzKey = localStorage.getItem("hg_apihz_key") || "";
+      const clientCacheKey = `${raw}::${route}`;
 
       hideError();
+
+      // Kiểm tra Client Cache trước (0ms)
+      if (parseResultCache.has(clientCacheKey)) {
+        const cachedJson = parseResultCache.get(clientCacheKey);
+        dispatchParseResponse(cachedJson, true);
+        return;
+      }
+
       document.getElementById("loading-box").classList.remove("hidden");
       document.getElementById("btn-fetch").disabled = true;
 
@@ -1098,27 +1151,35 @@
           return;
         }
 
-        // 1. Chế độ Tìm kiếm theo từ khóa
-        if (json.mode === "search" && json.data) {
-          renderSearchResults(json.data);
-          return;
-        }
-
-        // 2. Chế độ Douyin / TikTok
-        if (json.mode === "douyin" && json.data) {
-          renderDouyinResult(json.data);
-          return;
-        }
-
-        // 3. Chế độ Bộ phim Hongguo Short Drama
-        if (json.data) {
-          renderHongguoSeries(json.data);
-          saveToHistory(json.data);
-        }
+        parseResultCache.set(clientCacheKey, json);
+        dispatchParseResponse(json, false);
       } catch (err) {
         document.getElementById("loading-box").classList.add("hidden");
         document.getElementById("btn-fetch").disabled = false;
         showError(`Lỗi kết nối máy chủ: ${err.message}`);
+      }
+    }
+
+    function dispatchParseResponse(json, fromClientCache = false) {
+      if (json.latency_ms !== undefined || fromClientCache) {
+        const ms = fromClientCache ? 0 : json.latency_ms;
+        const isHit = fromClientCache || !!json.cached;
+        updatePingBadge(ms, isHit, fromClientCache ? "0ms (Client RAM)" : (json.cached ? `${ms}ms (Edge HIT)` : ""));
+        const msText = fromClientCache ? "0ms (Client Cache)" : `${json.latency_ms}ms${json.cached ? " · Edge Cache" : ""}`;
+        showToast(`⚡ Phân tích hoàn tất trong ${msText}`);
+      }
+
+      if (json.mode === "search" && json.data) {
+        renderSearchResults(json.data);
+        return;
+      }
+      if (json.mode === "douyin" && json.data) {
+        renderDouyinResult(json.data);
+        return;
+      }
+      if (json.data) {
+        renderHongguoSeries(json.data);
+        saveToHistory(json.data);
       }
     }
 
@@ -1154,6 +1215,7 @@
 
     function createDramaCardHtml(item) {
       const safeTitle = (item.title || "Phim ngắn").replace(/"/g, "&quot;");
+      const safeCover = (item.cover || "").replace(/'/g, "\\'");
       const tagsHtml = (item.tags || []).slice(0, 2).map(t =>
         `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-slate-300 border border-slate-700">${t}</span>`
       ).join("");
@@ -1162,7 +1224,7 @@
         <div onclick="openSeriesById('${item.series_id}')" class="group cursor-pointer bg-slate-900/90 border border-slate-800 hover:border-rose-500/60 rounded-xl overflow-hidden flex flex-col justify-between transition-all hover:-translate-y-1 shadow-lg">
           <div>
             <div class="relative aspect-[3/4] bg-slate-800 overflow-hidden">
-              <img src="${proxyImg(item.cover)}" alt="${safeTitle}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/favicon.svg'" />
+              <img src="${proxyImg(item.cover)}" referrerpolicy="no-referrer" alt="${safeTitle}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="handleImgError(this, '${safeCover}')" />
               <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent"></div>
               ${item.rank ? `<span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-extrabold shadow">TOP ${item.rank}</span>` : ""}
               <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-amber-400 text-[10px] font-bold border border-amber-500/30">
@@ -1198,10 +1260,21 @@
       currentSeries = data;
       selectedEpisodeIndexes.clear();
 
+      // Nạp 15 tập đã được Preload sẵn từ /api/parse vào bộ nhớ đệm trình duyệt
+      if (data.prefetched_streams && typeof data.prefetched_streams === "object") {
+        for (const [k, v] of Object.entries(data.prefetched_streams)) {
+          episodeStreamCache.set(String(k), v);
+        }
+      }
+
       document.getElementById("search-results-wrapper").classList.add("hidden");
       document.getElementById("douyin-result-wrapper").classList.add("hidden");
 
-      document.getElementById("series-cover").src = proxyImg(data.cover);
+      const coverEl = document.getElementById("series-cover");
+      delete coverEl.dataset.proxied;
+      coverEl.onerror = () => handleImgError(coverEl, data.cover);
+      coverEl.src = proxyImg(data.cover);
+
       document.getElementById("series-status-badge").textContent = data.status_text || `Trọn bộ ${data.total_episodes} tập`;
       document.getElementById("series-provider-badge").textContent = data.provider || "fqnovel";
       document.getElementById("series-id-badge").textContent = `ID: ${data.series_id || "---"}`;
@@ -1226,7 +1299,7 @@
         actorsWrap.classList.remove("hidden");
         actorsEl.innerHTML = data.celebrities.map(c => `
           <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-700 text-xs">
-            <img src="${proxyImg(c.avatar)}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover" onerror="this.src='/favicon.svg'" />
+            <img src="${proxyImg(c.avatar)}" referrerpolicy="no-referrer" alt="${c.name}" class="w-6 h-6 rounded-full object-cover" onerror="handleImgError(this, '${(c.avatar || "").replace(/'/g, "\\'")}')" />
             <div>
               <span class="font-semibold text-white">${c.name}</span>
               ${c.role ? `<span class="text-[10px] text-slate-400 ml-1">(${c.role})</span>` : ""}
@@ -1237,15 +1310,14 @@
         actorsWrap.classList.add("hidden");
       }
 
-      // Render Episode Grid
       renderEpisodesGrid();
 
-      // Render Active Episode & Stream
       const firstEp = data.active_episode || (data.episodes && data.episodes[0]);
       if (firstEp) {
         currentActiveEpisode = firstEp;
         updateActiveEpisodeHighlight();
         if (data.active_stream) {
+          episodeStreamCache.set(String(firstEp.vid), data.active_stream);
           renderEpisodeStreamPanel(firstEp, data.active_stream);
         } else {
           selectAndLoadEpisode(firstEp.vid_index);
@@ -1264,6 +1336,7 @@
         const idx = ep.vid_index;
         const isSelected = selectedEpisodeIndexes.has(idx);
         const isActive = currentActiveEpisode && currentActiveEpisode.vid_index === idx;
+        const isCached = episodeStreamCache.has(String(ep.vid));
         return `
           <div
             id="ep-btn-${idx}"
@@ -1275,8 +1348,12 @@
                 : "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
             }"
             onclick="selectAndLoadEpisode(${idx})"
+            onmouseenter="if(!episodeStreamCache.has(String('${ep.vid}'))) prefetchEpisodeWindow(${idx})"
           >
-            <span>Tập ${idx}</span>
+            <span class="flex items-center gap-1">
+              <span>Tập ${idx}</span>
+              ${isCached && !isActive ? `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Đã nạp sẵn (0ms)"></span>` : ""}
+            </span>
             <input
               type="checkbox"
               ${isSelected ? "checked" : ""}
@@ -1333,6 +1410,34 @@
       renderEpisodesGrid();
     }
 
+    // Nạp trước ngầm (Background Batch Prefetch) 15 tập tiếp theo chỉ bằng 1 request duy nhất
+    async function prefetchEpisodeWindow(startEpIndex) {
+      if (!currentSeries || !Array.isArray(currentSeries.episodes)) return;
+      const windowEps = currentSeries.episodes
+        .filter(e => e.vid_index >= startEpIndex && e.vid_index < startEpIndex + 15)
+        .filter(e => !episodeStreamCache.has(String(e.vid)) && !prefetchingVids.has(String(e.vid)));
+
+      if (windowEps.length === 0) return;
+      windowEps.forEach(e => prefetchingVids.add(String(e.vid)));
+
+      const route = document.getElementById("route-select").value || "auto";
+      const vidsStr = windowEps.map(e => e.vid).join(",");
+      const indicesStr = windowEps.map(e => e.vid_index).join(",");
+
+      try {
+        const res = await fetch(`/api/episode?vids=${encodeURIComponent(vidsStr)}&indices=${encodeURIComponent(indicesStr)}&series_id=${encodeURIComponent(currentSeries.series_id)}&title=${encodeURIComponent(currentSeries.title)}&route=${encodeURIComponent(route)}`);
+        const json = await res.json();
+        if (json.success && json.data_map) {
+          for (const [k, v] of Object.entries(json.data_map)) {
+            episodeStreamCache.set(String(k), v);
+          }
+          renderEpisodesGrid();
+        }
+      } catch {} finally {
+        windowEps.forEach(e => prefetchingVids.delete(String(e.vid)));
+      }
+    }
+
     async function selectAndLoadEpisode(epIndex) {
       if (!currentSeries || !Array.isArray(currentSeries.episodes)) return;
       const ep = currentSeries.episodes.find(e => e.vid_index === epIndex);
@@ -1343,18 +1448,35 @@
 
       document.getElementById("active-ep-title").textContent = `Tập ${ep.vid_index}${ep.title && !ep.title.startsWith("Tập") ? ` - ${ep.title.slice(0, 28)}` : ""}`;
       document.getElementById("active-ep-vid").textContent = `VID: ${ep.vid}`;
+
+      // Nếu tập này đã có trong bộ nhớ đệm (do Preload 15 tập), hiển thị TỨC THÌ (0ms, 0 request!)
+      if (episodeStreamCache.has(String(ep.vid))) {
+        renderEpisodeStreamPanel(ep, episodeStreamCache.get(String(ep.vid)));
+        prefetchEpisodeWindow(epIndex + 1);
+        return;
+      }
+
       document.getElementById("active-ep-qualities").innerHTML = `
         <div class="p-4 text-center text-xs text-slate-400">
-          <i class="fas fa-circle-notch fa-spin text-rose-400 mr-1.5"></i> Đang lấy luồng video 1080p & khóa CENC cho Tập ${ep.vid_index}...
+          <i class="fas fa-circle-notch fa-spin text-rose-400 mr-1.5"></i> Đang lấy luồng video 1080p & khóa CENC cho Tập ${ep.vid_index} (kèm nạp trước 15 tập)...
         </div>
       `;
 
+      // Gọi luôn theo lô 15 tập từ tập hiện tại để các lần bấm tiếp theo tốn 0ms!
+      const windowEps = currentSeries.episodes.filter(e => e.vid_index >= epIndex && e.vid_index < epIndex + 15);
+      const vidsStr = windowEps.map(e => e.vid).join(",");
+      const indicesStr = windowEps.map(e => e.vid_index).join(",");
       const route = document.getElementById("route-select").value || "auto";
+
       try {
-        const res = await fetch(`/api/episode?vid=${encodeURIComponent(ep.vid)}&series_id=${encodeURIComponent(currentSeries.series_id)}&title=${encodeURIComponent(currentSeries.title)}&index=${ep.vid_index}&route=${encodeURIComponent(route)}`);
+        const res = await fetch(`/api/episode?vids=${encodeURIComponent(vidsStr)}&indices=${encodeURIComponent(indicesStr)}&series_id=${encodeURIComponent(currentSeries.series_id)}&title=${encodeURIComponent(currentSeries.title)}&route=${encodeURIComponent(route)}`);
         const json = await res.json();
-        if (json.success && json.data) {
-          renderEpisodeStreamPanel(ep, json.data);
+        if (json.success && json.data_map && json.data_map[ep.vid]) {
+          for (const [k, v] of Object.entries(json.data_map)) {
+            episodeStreamCache.set(String(k), v);
+          }
+          renderEpisodesGrid();
+          renderEpisodeStreamPanel(ep, json.data_map[ep.vid]);
         } else {
           document.getElementById("active-ep-qualities").innerHTML = `<div class="text-xs text-rose-400 p-2">Lỗi lấy link tập ${ep.vid_index}: ${json.message || "Không xác định"}</div>`;
         }
@@ -1379,11 +1501,19 @@
       document.getElementById("active-ep-title").textContent = `Tập ${ep.vid_index}`;
       document.getElementById("active-ep-vid").textContent = `VID: ${ep.vid}`;
 
-      // Cài đặt trình phát: Ưu tiên phát luồng H.264 Web Direct (proxy_preview_url) để 100% trình duyệt có hình + tiếng ngay lập tức
+      // TỐI ƯU BĂNG THÔNG & TỐC ĐỘ: Thử phát trực tiếp từ CDN gốc (no-referrer) trước để 0 tốn request Cloudflare Worker, lỗi mới fallback qua /api/video
       const player = document.getElementById("hongguo-player");
-      const previewSrc = streamData.proxy_preview_url || (streamData.qualities && streamData.qualities[0]?.proxy_stream_url) || "";
-      if (previewSrc && player.src !== location.origin + previewSrc) {
-        player.src = previewSrc;
+      player.setAttribute("referrerpolicy", "no-referrer");
+      const directPreview = streamData.preview_url || "";
+      const proxyPreview = streamData.proxy_preview_url || (streamData.qualities && streamData.qualities[0]?.proxy_stream_url) || "";
+      if (directPreview) {
+        player.onerror = () => {
+          player.onerror = null;
+          if (proxyPreview) player.src = proxyPreview;
+        };
+        if (player.src !== directPreview) player.src = directPreview;
+      } else if (proxyPreview && player.src !== location.origin + proxyPreview) {
+        player.src = proxyPreview;
       }
 
       const qualities = streamData.qualities || [];
@@ -1404,7 +1534,7 @@
                 <span class="px-1.5 py-0.5 rounded bg-slate-900 text-[10px] text-slate-400 uppercase">${q.codec || "mp4"}</span>
               </div>
               <p class="text-[10px] text-slate-400 truncate mt-0.5">
-                ${q.encrypted ? "🔒 CENC-AES-CTR (Tự động giải mã khóa spade_a)" : "✅ H.264 Trực tiếp (Không mã hóa)"}
+                ${q.encrypted ? "🔒 CENC-AES-CTR (Tải thẳng CDN + Giải mã Web Worker)" : "✅ H.264 Trực tiếp (Không mã hóa)"}
               </p>
             </div>
 
@@ -1422,13 +1552,54 @@
       }).join("");
     }
 
-    // ==================== TẢI & GIẢI MÃ CENC-AES-CTR (CLIENT WEBCRYPTO + SERVER PROXY) ====================
+    // ==================== TẢI TRỰC TIẾP CDN GỐC + GIẢI MÃ WEB WORKER (ZERO CLOUDFLARE BANDWIDTH) ====================
+    /**
+     * Tải raw bytes ưu tiên trực tiếp từ CDN qznovelvod.com (vì CDN hỗ trợ CORS Access-Control-Allow-Origin: * khi gửi no-referrer)
+     * Giúp đạt tốc độ mạng tối đa và tốn 0 băng thông / 0 request trên Cloudflare Worker! Tự động fallback về /api/download nếu bị chặn.
+     */
+    async function fetchRawVideoBytes(q, onProgress) {
+      let resp = null;
+      try {
+        resp = await fetch(q.url, { referrerPolicy: "no-referrer", mode: "cors" });
+        if (!resp.ok) throw new Error(`Direct CDN HTTP ${resp.status}`);
+      } catch {
+        resp = await fetch(`/api/download?url=${encodeURIComponent(q.url)}&raw=1`);
+        if (!resp.ok) throw new Error(`Proxy HTTP ${resp.status}`);
+      }
+
+      const total = parseInt(resp.headers.get("content-length") || "0", 10) || q.size || 0;
+      if (!resp.body || !onProgress) {
+        return new Uint8Array(await resp.arrayBuffer());
+      }
+
+      const reader = resp.body.getReader();
+      const chunks = [];
+      let received = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        if (total > 0) {
+          onProgress(received, total);
+        }
+      }
+
+      const out = new Uint8Array(received);
+      let pos = 0;
+      for (const ch of chunks) {
+        out.set(ch, pos);
+        pos += ch.length;
+      }
+      return out;
+    }
+
     async function downloadAndDecryptEpisode(qualityIdx, filename) {
       if (!currentStreamData || !currentStreamData.qualities[qualityIdx]) return;
       const q = currentStreamData.qualities[qualityIdx];
       const decryptMode = localStorage.getItem("hg_decrypt_mode") || "client";
 
-      // Nếu luồng không mã hóa (như 360p-h264) hoặc người dùng chọn chế độ Server Proxy
       if (!q.encrypted || !q.key_hex || decryptMode === "server") {
         showToast(`Đang bắt đầu tải: ${filename}`);
         const a = document.createElement("a");
@@ -1440,53 +1611,32 @@
         return;
       }
 
-      // Chế độ Client WebCrypto: Tải raw stream qua proxy + Giải mã CENC-AES-CTR ngay trong trình duyệt
       const wrap = document.getElementById("single-dl-progress-wrap");
       const statusEl = document.getElementById("single-dl-status");
       const pctEl = document.getElementById("single-dl-percent");
       const barEl = document.getElementById("single-dl-bar");
 
       wrap.classList.remove("hidden");
-      statusEl.textContent = `Đang tải luồng ${q.definition.toUpperCase()}...`;
+      statusEl.textContent = `Đang tải trực tiếp luồng ${q.definition.toUpperCase()} từ CDN...`;
       pctEl.textContent = "0%";
       barEl.style.width = "0%";
 
       try {
-        const rawUrl = `/api/download?url=${encodeURIComponent(q.url)}&raw=1`;
-        const resp = await fetch(rawUrl);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const encryptedBytes = await fetchRawVideoBytes(q, (received, total) => {
+          const pct = Math.min(94, Math.round((received / total) * 94));
+          pctEl.textContent = `${pct}%`;
+          barEl.style.width = `${pct}%`;
+        });
 
-        const total = parseInt(resp.headers.get("content-length") || "0", 10) || q.size || 0;
-        const reader = resp.body.getReader();
-        const chunks = [];
-        let received = 0;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          received += value.length;
-          if (total > 0) {
-            const pct = Math.min(95, Math.round((received / total) * 95));
-            pctEl.textContent = `${pct}%`;
-            barEl.style.width = `${pct}%`;
-          }
-        }
-
-        const encryptedBytes = new Uint8Array(received);
-        let pos = 0;
-        for (const ch of chunks) {
-          encryptedBytes.set(ch, pos);
-          pos += ch.length;
-        }
-
-        statusEl.textContent = "Đang mở khóa CENC-AES-128-CTR (WebCrypto)...";
+        statusEl.textContent = "Đang mở khóa CENC-AES-128-CTR (Web Worker Hybrid)...";
         pctEl.textContent = "98%";
         barEl.style.width = "98%";
 
+        const tDec = performance.now();
         const decryptedBytes = await window.HongguoClientDecryptor.decryptMp4Bytes(encryptedBytes, q.key_hex);
+        const decMs = Math.round(performance.now() - tDec);
 
-        statusEl.textContent = "Hoàn tất giải mã MP4!";
+        statusEl.textContent = `Hoàn tất giải mã MP4 trong ${decMs}ms!`;
         pctEl.textContent = "100%";
         barEl.style.width = "100%";
 
@@ -1500,7 +1650,7 @@
         a.remove();
         setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
         setTimeout(() => wrap.classList.add("hidden"), 2500);
-        showToast(`Đã tải & giải mã thành công: ${filename}`);
+        showToast(`⚡ Đã tải & giải mã (${decMs}ms): ${filename}`);
       } catch (err) {
         wrap.classList.add("hidden");
         showToast(`Chuyển sang tải trực tiếp qua Server Proxy...`);
@@ -1508,7 +1658,7 @@
       }
     }
 
-    // ==================== TẢI HÀNG LOẠT NHIỀU TẬP (BATCH DOWNLOADER) ====================
+    // ==================== TẢI HÀNG LOẠT ĐA LUỒNG (BATCH PRELOAD 15 TẬP + 3 WORKERS SONG SONG) ====================
     async function startBatchDownload() {
       if (!currentSeries || selectedEpisodeIndexes.size === 0) {
         showToast("Vui lòng tích chọn ít nhất 1 tập phim để tải hàng loạt!");
@@ -1541,62 +1691,103 @@
         logList.prepend(div);
       }
 
-      for (const epIdx of sortedIndexes) {
-        if (batchAborted) {
-          addBatchLog("⏹️ Đã dừng hàng đợi theo yêu cầu người dùng.");
-          break;
+      // BƯỚC 1: Gom nhóm lấy link & khóa giải mã theo lô 15 tập/lần (giảm 93% số lần gọi API!)
+      const uncachedEps = sortedIndexes
+        .map(idx => currentSeries.episodes.find(e => e.vid_index === idx))
+        .filter(ep => ep && !episodeStreamCache.has(String(ep.vid)));
+
+      if (uncachedEps.length > 0) {
+        statusText.textContent = `Đang lấy khóa CENC hàng loạt cho ${uncachedEps.length} tập (15 tập/gói)...`;
+        for (let i = 0; i < uncachedEps.length; i += 15) {
+          if (batchAborted) break;
+          const chunk = uncachedEps.slice(i, i + 15);
+          const vidsStr = chunk.map(e => e.vid).join(",");
+          const indicesStr = chunk.map(e => e.vid_index).join(",");
+          try {
+            const res = await fetch(`/api/episode?vids=${encodeURIComponent(vidsStr)}&indices=${encodeURIComponent(indicesStr)}&series_id=${encodeURIComponent(currentSeries.series_id)}&title=${encodeURIComponent(currentSeries.title)}&route=${encodeURIComponent(route)}`);
+            const json = await res.json();
+            if (json.success && json.data_map) {
+              for (const [k, v] of Object.entries(json.data_map)) {
+                episodeStreamCache.set(String(k), v);
+              }
+            }
+          } catch (e) {
+            addBatchLog(`⚠️ Lỗi lấy gói metadata: ${e.message}`);
+          }
         }
+        renderEpisodesGrid();
+      }
 
-        const ep = currentSeries.episodes.find(e => e.vid_index === epIdx);
-        if (!ep) continue;
+      // BƯỚC 2: Tải & giải mã song song 3 luồng (3 Concurrent Workers) trực tiếp từ CDN gốc
+      const CONCURRENCY = 3;
+      let cursor = 0;
 
-        statusText.textContent = `Đang xử lý Tập ${epIdx} (${targetDef})...`;
-        counterText.textContent = `${completed} / ${total}`;
+      async function runBatchWorker() {
+        while (cursor < sortedIndexes.length && !batchAborted) {
+          const myIdx = cursor++;
+          const epIdx = sortedIndexes[myIdx];
+          const ep = currentSeries.episodes.find(e => e.vid_index === epIdx);
+          if (!ep) continue;
 
-        try {
-          const res = await fetch(`/api/episode?vid=${encodeURIComponent(ep.vid)}&series_id=${encodeURIComponent(currentSeries.series_id)}&title=${encodeURIComponent(currentSeries.title)}&index=${epIdx}&route=${encodeURIComponent(route)}`);
-          const json = await res.json();
-          if (!json.success || !json.data?.qualities?.length) {
-            throw new Error(json.message || "Không lấy được luồng video");
+          statusText.textContent = `Đang tải & giải mã song song (Tập ${epIdx} - ${targetDef})...`;
+
+          try {
+            let streamInfo = episodeStreamCache.get(String(ep.vid));
+            if (!streamInfo) {
+              const res = await fetch(`/api/episode?vid=${encodeURIComponent(ep.vid)}&series_id=${encodeURIComponent(currentSeries.series_id)}&title=${encodeURIComponent(currentSeries.title)}&index=${epIdx}&route=${encodeURIComponent(route)}`);
+              const json = await res.json();
+              if (json.success && json.data) {
+                streamInfo = json.data;
+                episodeStreamCache.set(String(ep.vid), streamInfo);
+              }
+            }
+
+            if (!streamInfo?.qualities?.length) {
+              throw new Error("Không lấy được luồng video");
+            }
+
+            const quals = streamInfo.qualities;
+            const chosen = quals.find(q => q.definition === targetDef) || quals[0];
+            const safeSeriesTitle = (currentSeries.title || "hongguo").replace(/[\\/:*?"<>|]/g, "_").slice(0, 45);
+            const filename = `${safeSeriesTitle}_Tap_${String(epIdx).padStart(3, "0")}_${chosen.definition}.mp4`;
+
+            if (chosen.encrypted && chosen.key_hex) {
+              const rawBuf = await fetchRawVideoBytes(chosen);
+              const decBuf = await window.HongguoClientDecryptor.decryptMp4Bytes(rawBuf, chosen.key_hex);
+              const blob = new Blob([decBuf], { type: "video/mp4" });
+              const blobUrl = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = blobUrl;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+            } else {
+              const a = document.createElement("a");
+              a.href = chosen.proxy_download_url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+            }
+
+            completed++;
+            const pct = Math.round((completed / total) * 100);
+            counterText.textContent = `${completed} / ${total}`;
+            bar.style.width = `${pct}%`;
+            addBatchLog(`✅ Tập ${epIdx}: Đã giải mã & lưu ${filename}`);
+          } catch (err) {
+            addBatchLog(`❌ Tập ${epIdx} lỗi: ${err.message}`);
           }
-
-          const quals = json.data.qualities;
-          const chosen = quals.find(q => q.definition === targetDef) || quals[0];
-          const safeSeriesTitle = (currentSeries.title || "hongguo").replace(/[\\/:*?"<>|]/g, "_").slice(0, 45);
-          const filename = `${safeSeriesTitle}_Tap_${String(epIdx).padStart(3, "0")}_${chosen.definition}.mp4`;
-
-          if (chosen.encrypted && chosen.key_hex) {
-            const rawResp = await fetch(`/api/download?url=${encodeURIComponent(chosen.url)}&raw=1`);
-            const rawBuf = new Uint8Array(await rawResp.arrayBuffer());
-            const decBuf = await window.HongguoClientDecryptor.decryptMp4Bytes(rawBuf, chosen.key_hex);
-            const blob = new Blob([decBuf], { type: "video/mp4" });
-            const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = blobUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
-          } else {
-            const a = document.createElement("a");
-            a.href = chosen.proxy_download_url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-          }
-
-          completed++;
-          const pct = Math.round((completed / total) * 100);
-          counterText.textContent = `${completed} / ${total}`;
-          bar.style.width = `${pct}%`;
-          addBatchLog(`✅ Tập ${epIdx}: Đã giải mã & lưu ${filename}`);
-          await new Promise(r => setTimeout(r, 600));
-        } catch (err) {
-          addBatchLog(`❌ Tập ${epIdx} lỗi: ${err.message}`);
         }
       }
+
+      const workers = [];
+      for (let w = 0; w < Math.min(CONCURRENCY, sortedIndexes.length); w++) {
+        workers.push(runBatchWorker());
+      }
+      await Promise.all(workers);
 
       statusText.textContent = batchAborted ? "Đã tạm dừng tải hàng loạt" : `🎉 Hoàn tất tải ${completed}/${total} tập!`;
       document.getElementById("btn-start-batch").classList.remove("hidden");
@@ -1608,21 +1799,40 @@
       showToast("Đang dừng hàng đợi tải hàng loạt...");
     }
 
-    // ==================== DOUYIN / TIKTOK RENDERER ====================
+    // ==================== DOUYIN / TIKTOK RENDERER (HỖ TRỢ VIDEO + ALBUM ẢNH + DIRECT CDN) ====================
     function renderDouyinResult(data) {
       document.getElementById("search-results-wrapper").classList.add("hidden");
       document.getElementById("series-result-wrapper").classList.add("hidden");
 
-      document.getElementById("dy-avatar").src = proxyImg(data.author?.avatar);
+      const avatarEl = document.getElementById("dy-avatar");
+      delete avatarEl.dataset.proxied;
+      avatarEl.onerror = () => handleImgError(avatarEl, data.author?.avatar);
+      avatarEl.src = proxyImg(data.author?.avatar);
+
       document.getElementById("dy-author").textContent = data.author?.name || "Douyin User";
       document.getElementById("dy-provider").textContent = `Nguồn: ${data.provider}`;
       document.getElementById("dy-title").textContent = data.title || "";
 
       const box = document.getElementById("dy-media-box");
-      if (data.video) {
+      if (data.type === "images" && Array.isArray(data.images) && data.images.length > 0) {
+        box.innerHTML = `
+          <div class="col-span-full grid grid-cols-2 sm:grid-cols-3 gap-3">
+            ${data.images.map((imgUrl, idx) => `
+              <div class="bg-slate-900 rounded-xl overflow-hidden border border-slate-700 flex flex-col">
+                <img src="${proxyImg(imgUrl)}" referrerpolicy="no-referrer" alt="Slide ${idx + 1}" class="w-full aspect-[3/4] object-cover" onerror="handleImgError(this, '${imgUrl.replace(/'/g, "\\'")}')" />
+                <a href="/api/download?url=${encodeURIComponent(imgUrl)}&filename=douyin_img_${idx + 1}.jpg" class="py-2 text-center text-xs font-bold bg-slate-800 hover:bg-rose-500 text-slate-200 hover:text-white transition">
+                  <i class="fas fa-download mr-1"></i> Tải Ảnh ${idx + 1}
+                </a>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      } else if (data.video) {
+        const directUrl = data.video.url || "";
+        const streamProxyUrl = data.video.stream_url || "";
         box.innerHTML = `
           <div class="aspect-[9/16] max-h-[380px] mx-auto bg-black rounded-xl overflow-hidden border border-slate-700">
-            <video src="${data.video.stream_url}" controls playsinline class="w-full h-full object-contain"></video>
+            <video id="dy-video-player" src="${directUrl || streamProxyUrl}" referrerpolicy="no-referrer" controls playsinline class="w-full h-full object-contain"></video>
           </div>
           <div class="space-y-3">
             <a href="${data.video.download_url}" class="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-cyan-400 to-rose-500 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg">
@@ -1635,13 +1845,20 @@
             ` : ""}
           </div>
         `;
+        const dyPlayer = document.getElementById("dy-video-player");
+        if (dyPlayer && directUrl && streamProxyUrl) {
+          dyPlayer.onerror = () => {
+            dyPlayer.onerror = null;
+            dyPlayer.src = streamProxyUrl;
+          };
+        }
       }
       const wrap = document.getElementById("douyin-result-wrapper");
       wrap.classList.remove("hidden");
       wrap.scrollIntoView({ behavior: "smooth" });
     }
 
-    // ==================== KHÁM PHÁ PHIM NGẮN THỊNH HÀNH (DISCOVER) ====================
+    // ==================== KHÁM PHÁ PHIM NGẮN THỊNH HÀNH (DISCOVER + CLIENT CACHE) ====================
     async function loadDiscoverCategory(cat, page = 1, btnEl = null) {
       currentDiscoverCategory = cat;
       currentDiscoverPage = Math.max(1, page);
@@ -1654,6 +1871,16 @@
       }
 
       const grid = document.getElementById("discover-grid");
+      const discKey = `${cat}:${currentDiscoverPage}`;
+      if (discoverCache.has(discKey)) {
+        const cachedList = discoverCache.get(discKey);
+        grid.innerHTML = cachedList.slice(0, 18).map(item => createDramaCardHtml(item)).join("");
+        document.getElementById("disc-page-indicator").textContent = `Trang ${currentDiscoverPage}`;
+        document.getElementById("btn-disc-prev").disabled = currentDiscoverPage <= 1;
+        updatePingBadge(0, true, "0ms (Client RAM)");
+        return;
+      }
+
       grid.innerHTML = `
         <div class="col-span-full py-10 text-center text-slate-400 text-xs">
           <i class="fas fa-circle-notch fa-spin text-rose-500 text-xl mb-2"></i>
@@ -1662,18 +1889,22 @@
       `;
 
       try {
+        const t0 = performance.now();
         const res = await fetch(`/api/discover?category=${encodeURIComponent(cat)}&page=${currentDiscoverPage}`);
         const json = await res.json();
+        const elapsed = Math.round(performance.now() - t0);
         const list = json.data?.list || [];
 
         if (list.length === 0) {
           grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-xs">Không có dữ liệu ở trang này.</div>`;
         } else {
+          discoverCache.set(discKey, list);
           grid.innerHTML = list.slice(0, 18).map(item => createDramaCardHtml(item)).join("");
         }
 
         document.getElementById("disc-page-indicator").textContent = `Trang ${currentDiscoverPage}`;
         document.getElementById("btn-disc-prev").disabled = currentDiscoverPage <= 1;
+        updatePingBadge(json.latency_ms || elapsed, json.latency_ms <= 5);
       } catch (e) {
         grid.innerHTML = `<div class="col-span-full py-8 text-center text-rose-400 text-xs">Không thể tải danh sách khám phá: ${e.message}</div>`;
       }

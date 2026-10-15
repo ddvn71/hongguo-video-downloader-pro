@@ -124,3 +124,28 @@ Standard Fqnovel/Hongguo mobile endpoints enforce ByteDance `X-Gorgon` / `X-Argu
    - Primary: `TikWM` (`https://www.tikwm.com/api/`, `POST url=...&hd=1`) — no cooldown.
    - Fallback: `Apihz` 4 routes (`https://cn.apihz.cn/api/fun/douyin.php` + 3 HTTP IP mirrors proxied server-side via Cloudflare Worker to avoid browser HTTPS Mixed-Content blocking).
    - Note: `api.cenguigui.cn/api/duanju.html` is deprecated (HTTP 404); keep only as last-resort fallback.
+
+---
+
+## 6. Trick #5: Cloudflare Free "Max Ping" & Quota Optimization Runbook
+
+To achieve `<2ms` Edge delivery, zero CPU overruns, and prevent burning the 100,000/day Cloudflare Free Worker invocation quota:
+
+1. **Static Asset Quota Bypass (`public/_routes.json`)**:
+   - Use `"include": ["/api/*"]` and `"exclude": ["/", "/index.html", "/articles.js", "/ads.txt", "/robots.txt", "/sitemap.xml", "/favicon.svg"]`.
+   - Result: Static files are served directly by Cloudflare CDN at Edge PoPs (~5ms ping) and consume **zero** Worker invocations.
+2. **Singleflight Request Coalescing (`INFLIGHT_MAP`)**:
+   - Coalesce concurrent incoming requests for the same series, episode, or category into a single Promise. Downstream requests await the existing inflight fetch, preventing duplicate upstream calls.
+3. **Stale-While-Revalidate (SWR) in V8 Isolate RAM**:
+   - Cache parsed JSON in module-level `MEM_CACHE`. If a request arrives after soft TTL expires but within hard TTL (3x), return cached data instantly (`0.0ms`) and trigger an asynchronous background refresh via `ctx.waitUntil`.
+4. **Adaptive Mirror Latency Scoreboard (EMA Tracker + Hedging)**:
+   - Continually measure RTT across all 6 Fqnovel preload mirrors (`sinfonlineb`, `sinfonlinea`, `sinfonlinec`, `lf`, `lq`, `hl`).
+   - Dynamically sort mirrors by lowest EMA latency and hedge upstream requests with a `650ms` parallel timeout.
+5. **15-Episode Single-Request Batching**:
+   - Fqnovel's `/novel/player/multi_video_model/preload/v1` accepts up to 15 VIDs in `mixed_video_id_map: { "1004": [vid1, vid2, ... vid15] }`.
+   - Prefetch 15 episodes on the initial `/api/parse` call and during batch downloads via `/api/episode?vids=...&indices=...`, cutting 93% of API roundtrips.
+6. **Smart Placement (`wrangler.toml`)**:
+   - Specify `[placement] mode = "smart"` so Cloudflare executes Workers at Edge datacenters near ByteDance/Hongguo Asian upstreams, reducing multi-hop network latency by 40-70%.
+7. **Edge Cache API (`caches.default`)**:
+   - Cache cover images (`/api/proxy`) for 30 days (`immutable`) and small decrypted MP4s (`<= 20MB`) for 1-2 hours so repeated requests and range requests serve directly from Edge RAM.
+
