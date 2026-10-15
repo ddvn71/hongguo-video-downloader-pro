@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hongguo Pro Downloader - Công Cụ Tìm Kiếm & Tải Video Hongguo Short Drama (红果免费短剧) 1080p Không Logo</title>
+  <meta name="description" content="Công cụ tìm kiếm và tải video phim ngắn Hongguo Short Drama (红果免费短剧 / Fanqie) Full HD 1080p không watermark miễn phí. Hỗ trợ giải mã CENC-AES-CTR tự động, tải trọn bộ nhiều tập và tương thích Douyin/TikTok." />
+  <meta name="keywords" content="download hongguo video, hongguo downloader, 红果免费短剧下载, tải video hongguo, tải phim ngắn trung quốc, hongguo short drama 1080p, novelquickapp downloader, hongguoduanju" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://hongguodownloader.pages.dev/" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Open Graph / Social Meta -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Hongguo Pro Downloader - Tải Phim Ngắn Hongguo (红果短剧) 1080p Không Logo" />
+  <meta property="og:description" content="Tìm kiếm trực tiếp kho phim ngắn Hongguo (Hồng Quả Đoản Kịch), xem trực tuyến và tải xuống Full HD 1080p tự động giải mã CENC-AES-CTR miễn phí." />
+  <meta property="og:url" content="https://hongguodownloader.pages.dev/" />
+
+  <!-- Schema.org JSON-LD Structured Data (Chuẩn SEO & Google AdSense) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Hongguo Pro Video Downloader",
+        "url": "https://hongguodownloader.pages.dev/",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "All",
+        "description": "Công cụ tìm kiếm, phân tích liên kết và tải video phim ngắn Hongguo Short Drama (红果免费短剧) chất lượng Full HD 1080p kèm giải mã CENC-AES-CTR tự động.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Làm thế nào để tải video từ ứng dụng Hongguo Short Drama (红果免费短剧)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bạn chỉ cần sao chép liên kết chia sẻ từ ứng dụng Hongguo (có dạng novelquickapp.com/s/...) hoặc nhập trực tiếp tên phim tiếng Trung / mã series_id vào ô tìm kiếm của Hongguo Pro Downloader, chọn tập phim và bấm tải chất lượng 1080p hoặc 360p H.264."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Tại sao video Hongguo tải ở nơi khác bị đen màn hình hoặc không mở được?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Các luồng video HD/1080p trên Hongguo được mã hóa bằng chuẩn CENC-AES-128-CTR (khóa spade_a). Hongguo Pro Downloader tích hợp sẵn bộ giải mã WebCrypto tự động mở khóa và tái cấu trúc header MP4 giúp video phát mượt mà trên mọi thiết bị."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#FF2E4C',
+              orange: '#FF6B2B',
+              cyan: '#25F4EE',
+              dark: '#0B1120',
+              card: '#151F32'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #FF2E4C 0%, #FF7A2F 50%, #FFB800 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-glow {
+      box-shadow: 0 0 35px -5px rgba(255, 46, 76, 0.28), 0 0 25px -5px rgba(255, 107, 43, 0.22);
+    }
+    .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    /* Light mode overrides */
+    html:not(.dark) body { background-color: #f8fafc; color: #0f172a; }
+    html:not(.dark) .bg-slate-900 { background-color: #ffffff !important; color: #0f172a; }
+    html:not(.dark) .bg-slate-900\/80, html:not(.dark) .bg-slate-900\/90 { background-color: rgba(255,255,255,0.92) !important; }
+    html:not(.dark) .bg-slate-800, html:not(.dark) .bg-slate-800\/80, html:not(.dark) .bg-slate-800\/90 { background-color: #f1f5f9 !important; color: #0f172a; }
+    html:not(.dark) .border-slate-800, html:not(.dark) .border-slate-700 { border-color: #cbd5e1 !important; }
+    html:not(.dark) .text-white, html:not(.dark) .text-slate-100, html:not(.dark) .text-slate-200 { color: #0f172a !important; }
+    html:not(.dark) .text-slate-300, html:not(.dark) .text-slate-400 { color: #475569 !important; }
+  </style>
+</head>
+<body class="bg-[#0B1120] text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+  <!-- TOP ANNOUNCEMENT BAR -->
+  <div class="bg-gradient-to-r from-rose-600/90 via-orange-600/90 to-amber-600/90 text-white text-xs py-1.5 px-4 text-center font-medium">
+    <span class="inline-flex items-center gap-1.5">
+      <i class="fas fa-bolt"></i>
+      <span id="top-banner-text">MỚI 2026: Hỗ trợ tìm kiếm trực tiếp kho phim Hongguo (红果短剧) + Giải mã CENC-AES-CTR 1080p ngay trên trình duyệt!</span>
+    </span>
+  </div>
+
+  <!-- STICKY HEADER NAVBAR -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-[#0B1120]/85 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <a href="#" onclick="scrollToTop()" class="flex items-center space-x-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FF2E4C] via-[#FF6B2B] to-[#FFB800] p-0.5 shadow-lg group-hover:scale-105 transition-transform">
+          <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+            <i class="fas fa-play text-rose-500 text-base group-hover:text-amber-400 transition-colors"></i>
+          </div>
+        </div>
+        <div>
+          <span class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5">
+            Hongguo <span class="text-[11px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30">PRO</span>
+          </span>
+          <p class="text-[11px] text-slate-400 -mt-1" id="nav-subtitle">红果短剧 · Trình Tải & Giải Mã 1080p</p>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-6 text-xs font-semibold text-slate-300">
+        <a href="#tool-section" class="hover:text-rose-400 transition-colors flex items-center gap-1.5">
+          <i class="fas fa-download text-rose-500"></i> <span data-i18n="nav_tool">Công Cụ Tải</span>
+        </a>
+        <a href="#discover" class="hover:text-rose-400 transition-colors flex items-center gap-1.5">
+          <i class="fas fa-fire text-amber-400"></i> <span data-i18n="nav_discover">Khám Phá Phim Hot</span>
+        </a>
+        <a href="#how-it-works" class="hover:text-rose-400 transition-colors flex items-center gap-1.5">
+          <i class="fas fa-book-open text-cyan-400"></i> <span data-i18n="nav_guide">Hướng Dẫn</span>
+        </a>
+        <a href="#articles" class="hover:text-rose-400 transition-colors flex items-center gap-1.5">
+          <i class="fas fa-newspaper text-emerald-400"></i> <span data-i18n="nav_blog">Bài Viết & Kiến Thức</span>
+        </a>
+        <a href="#faq-section" class="hover:text-rose-400 transition-colors flex items-center gap-1.5">
+          <i class="fas fa-circle-question text-purple-400"></i> <span>FAQ</span>
+        </a>
+      </nav>
+
+      <!-- Controls Right -->
+      <div class="flex items-center space-x-2">
+        <select id="lang-select" onchange="changeLanguage(this.value)" aria-label="Language" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-rose-500 focus:outline-none">
+          <option value="vi">🇻🇳 Tiếng Việt</option>
+          <option value="en">🇺🇸 English</option>
+          <option value="zh">🇨🇳 中文</option>
+        </select>
+
+        <button onclick="toggleSettingsModal(true)" title="Cấu hình Tuyến API & Proxy" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700">
+          <i class="fas fa-sliders text-sm"></i>
+        </button>
+
+        <button onclick="toggleTheme()" title="Chế độ Sáng / Tối" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700">
+          <i id="theme-icon" class="fas fa-moon text-sm"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- HERO & OMNIBOX SEARCH SECTION -->
+    <section id="tool-section" class="text-center max-w-4xl mx-auto mb-10">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-xs font-medium text-rose-400 mb-4">
+        <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+        <span id="badge-title">Multi-Source Free API Engine · Fqnovel 6 Mirrors + Web SSR + WebCrypto CENC</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 leading-tight">
+        <span id="hero-title-1">Tìm Kiếm & Tải Video</span>
+        <span class="gradient-text" id="hero-title-2">Hongguo Short Drama</span>
+      </h1>
+
+      <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto mb-6 leading-relaxed" id="hero-desc">
+        Hỗ trợ dán link chia sẻ <strong>红果免费短剧 (novelquickapp.com / hongguoduanju.com)</strong>, mã <code>series_id</code>, tìm kiếm trực tiếp theo <strong>tên bộ phim</strong> hoặc tải video <strong>Douyin/TikTok</strong>. Tự động giải mã CENC-AES-CTR xuất file MP4 Full HD 1080p không logo.
+      </p>
+
+      <!-- OMNIBOX INPUT CARD -->
+      <div class="bg-slate-800/90 rounded-2xl p-3 sm:p-4 border border-slate-700 shadow-2xl hero-glow text-left">
+        <div class="flex flex-col sm:flex-row items-center gap-2.5">
+          <div class="relative w-full">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-rose-400">
+              <i class="fas fa-magnifying-glass-plus text-sm"></i>
+            </span>
+            <input
+              type="text"
+              id="url-input"
+              onkeydown="if(event.key==='Enter') handleFetch()"
+              placeholder="Dán link Hongguo (novelquickapp.com/s/...), mã series_id (7503745441910017049) hoặc nhập tên phim (ví dụ: 总裁)..."
+              class="w-full pl-11 pr-24 py-4 bg-slate-900 border border-slate-700 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+            />
+            <div class="absolute inset-y-0 right-0 flex items-center pr-2.5 space-x-1">
+              <button
+                id="btn-clear"
+                onclick="clearInput()"
+                class="hidden p-1.5 text-slate-400 hover:text-slate-200 transition-colors"
+                title="Xóa nội dung"
+              >
+                <i class="fas fa-times-circle text-sm"></i>
+              </button>
+              <button
+                onclick="pasteFromClipboard()"
+                class="px-2.5 py-1.5 text-xs font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg flex items-center gap-1.5 transition-colors"
+                title="Dán từ bộ nhớ tạm"
+              >
+                <i class="fas fa-paste text-xs text-rose-400"></i>
+                <span class="hidden sm:inline" id="btn-paste-text">Dán</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            id="btn-fetch"
+            onclick="handleFetch()"
+            class="w-full sm:w-auto px-7 py-4 bg-gradient-to-r from-[#FF2E4C] via-[#FF6B2B] to-[#FF9500] hover:opacity-95 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-rose-500/30 transition-all whitespace-nowrap active:scale-95"
+          >
+            <i class="fas fa-bolt text-sm"></i>
+            <span id="btn-fetch-text">Phân Tích & Tải</span>
+          </button>
+        </div>
+
+        <!-- QUICK DEMO / SAMPLE TAGS -->
+        <div class="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
+          <span class="text-slate-400 font-medium mr-1"><i class="fas fa-wand-magic-sparkles text-amber-400 mr-1"></i>Thử nhanh:</span>
+          <button onclick="quickTry('7503745441910017049')" class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 border border-slate-700/80 transition">
+            🎬 宴律，你的白月光回国了 (76 tập)
+          </button>
+          <button onclick="quickTry('7686713195246930968')" class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 border border-slate-700/80 transition">
+            👑 首辅娇娘 (69 tập)
+          </button>
+          <button onclick="quickTry('总裁')" class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-700/80 transition">
+            🔍 Tìm: "总裁 (Tổng tài)"
+          </button>
+          <button onclick="quickTry('重生')" class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-700/80 transition">
+            🔍 Tìm: "重生 (Trọng sinh)"
+          </button>
+          <button onclick="quickTry('古装')" class="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-700/80 transition">
+            🔍 Tìm: "古装 (Cổ trang)"
+          </button>
+        </div>
+
+        <!-- ROUTE SELECTOR & ENGINE STATUS -->
+        <div class="mt-3 pt-3 border-t border-slate-700/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+          <div class="flex flex-wrap items-center gap-2">
+            <i class="fas fa-network-wired text-rose-400"></i>
+            <span id="label-route">Nguồn API Miễn Phí:</span>
+            <select
+              id="route-select"
+              onchange="saveSelectedRoute(this.value)"
+              class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-rose-500 focus:outline-none"
+            >
+              <option value="auto">⚡ Tự Động Xoay Tua 9 Nguồn API Free (Khuyên Dùng)</option>
+              <option value="fqnovel-0">🚀 Tuyến 1: Fqnovel App Preload B (Full 1080p + CENC Key)</option>
+              <option value="fqnovel-1">🚀 Tuyến 2: Fqnovel App Preload A (sinfonlinea)</option>
+              <option value="fqnovel-2">📡 Tuyến 3: Fqnovel App Preload C (sinfonlinec)</option>
+              <option value="fqnovel-3">📡 Tuyến 4: Fqnovel App Mirror LF (lf.fqnovel)</option>
+              <option value="fqnovel-4">📡 Tuyến 5: Fqnovel App Mirror LQ (lq.fqnovel)</option>
+              <option value="web-ssr">🌐 Tuyến 6: Hongguo Web SSR (hongguoduanju.com - Không chữ ký)</option>
+              <option value="third-party">🔗 Tuyến 7: Third-Party / Custom Render Python API</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 text-[11px] text-emerald-400">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>WebCrypto CENC-AES-CTR Sẵn Sàng</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOADING INDICATOR -->
+    <div id="loading-box" class="hidden max-w-3xl mx-auto my-8 p-6 rounded-2xl bg-slate-800/80 border border-slate-700 text-center fade-in">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 mb-3">
+        <i class="fas fa-circle-notch fa-spin text-2xl"></i>
+      </div>
+      <h3 class="text-base font-bold text-white" id="loading-title">Đang kết nối cụm API Hongguo & phân giải dữ liệu...</h3>
+      <p class="text-xs text-slate-400 mt-1" id="loading-subtitle">Đang xoay tua qua Fqnovel Preload & Hongguo Web SSR...</p>
+    </div>
+
+    <!-- ERROR ALERT BOX -->
+    <div id="error-box" class="hidden max-w-3xl mx-auto my-6 p-4 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-200 text-sm flex items-start gap-3 fade-in">
+      <i class="fas fa-triangle-exclamation text-rose-400 text-lg mt-0.5"></i>
+      <div class="flex-1">
+        <h4 class="font-bold text-rose-300">Không thể phân tích dữ liệu</h4>
+        <p id="error-message" class="text-xs text-rose-200/90 mt-1"></p>
+      </div>
+      <button onclick="hideError()" class="text-rose-400 hover:text-white"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- SEARCH RESULTS PANEL (KHI NGƯỜI DÙNG TÌM THEO TỪ KHÓA) -->
+    <section id="search-results-wrapper" class="hidden max-w-6xl mx-auto mb-12 fade-in">
+      <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 sm:p-6 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-slate-700">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <i class="fas fa-magnifying-glass text-rose-400"></i>
+              <span>Kết quả tìm kiếm cho:</span>
+              <span id="search-keyword-label" class="text-rose-400">""</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Nhấn vào bất kỳ bộ phim nào bên dưới để tải danh sách toàn bộ các tập & lấy link MP4 1080p</p>
+          </div>
+          <span id="search-count-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">0 bộ phim</span>
+        </div>
+
+        <div id="search-results-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <!-- Cards populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- HONGGUO SERIES & EPISODE WORKSPACE (HIỂN THỊ KHI CHỌN 1 BỘ PHIM) -->
+    <section id="series-result-wrapper" class="hidden max-w-6xl mx-auto mb-12 fade-in">
+      <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-5 sm:p-7 shadow-2xl">
+
+        <!-- 1. SERIES METADATA HEADER -->
+        <div class="flex flex-col md:flex-row gap-5 pb-6 border-b border-slate-700">
+          <!-- Poster Cover -->
+          <div class="w-32 sm:w-40 flex-shrink-0 mx-auto md:mx-0">
+            <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-900 border border-slate-700 shadow-lg">
+              <img id="series-cover" src="" alt="Cover" class="w-full h-full object-cover" onerror="this.src='/favicon.svg'" />
+              <span id="series-status-badge" class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[11px] font-bold text-amber-400 border border-amber-500/30">
+                Trọn bộ
+              </span>
+            </div>
+          </div>
+
+          <!-- Series Info -->
+          <div class="flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span class="px-2.5 py-0.5 text-[11px] font-bold rounded-md bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                  红果短剧 · Hongguo Drama
+                </span>
+                <span id="series-provider-badge" class="px-2.5 py-0.5 text-[11px] font-semibold rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  fqnovel-mirror-0
+                </span>
+                <span id="series-id-badge" class="text-xs font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700">
+                  ID: ---
+                </span>
+              </div>
+
+              <h2 id="series-title" class="text-xl sm:text-2xl font-extrabold text-white mb-2">Tên Bộ Phim</h2>
+
+              <!-- Tags -->
+              <div id="series-tags" class="flex flex-wrap gap-1.5 mb-3"></div>
+
+              <!-- Intro / Synopsis -->
+              <p id="series-intro" class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4"></p>
+
+              <!-- Celebrities / Actors -->
+              <div id="series-actors-wrap" class="hidden mb-3">
+                <span class="text-xs font-semibold text-slate-400 block mb-1.5"><i class="fas fa-users text-rose-400 mr-1"></i>Diễn viên chính:</span>
+                <div id="series-actors" class="flex flex-wrap gap-2"></div>
+              </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="flex flex-wrap items-center gap-4 pt-3 border-t border-slate-700/60 text-xs text-slate-300">
+              <div class="flex items-center gap-1.5">
+                <i class="fas fa-film text-rose-400"></i>
+                <span>Tổng số tập: <strong id="series-total-eps" class="text-white">0</strong></span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <i class="fas fa-eye text-cyan-400"></i>
+                <span>Lượt xem: <strong id="series-views" class="text-white">---</strong></span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <i class="fas fa-heart text-pink-500"></i>
+                <span>Yêu thích: <strong id="series-likes" class="text-white">---</strong></span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <i class="fas fa-bookmark text-amber-400"></i>
+                <span>Theo dõi: <strong id="series-favs" class="text-white">---</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. TWO-COLUMN WORKSPACE: LEFT = VIDEO PLAYER & SINGLE DOWNLOAD | RIGHT = EPISODE SELECTOR & BATCH DOWNLOAD -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+
+          <!-- LEFT COLUMN (5 cols): ACTIVE EPISODE PLAYER & MULTI-QUALITY DOWNLOAD -->
+          <div class="lg:col-span-5 flex flex-col gap-4">
+            <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <span class="text-[11px] uppercase tracking-wider font-bold text-rose-400 block">Đang chọn phát & tải</span>
+                  <h3 id="active-ep-title" class="text-base font-bold text-white">Tập 1</h3>
+                </div>
+                <span id="active-ep-vid" class="text-[11px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">VID: ---</span>
+              </div>
+
+              <!-- HTML5 Video Player -->
+              <div class="relative aspect-[9/16] max-h-[420px] mx-auto bg-black rounded-xl overflow-hidden border border-slate-800 shadow-inner">
+                <video
+                  id="hongguo-player"
+                  controls
+                  playsinline
+                  preload="metadata"
+                  class="w-full h-full object-contain"
+                ></video>
+              </div>
+
+              <!-- Player Prev / Next Controls -->
+              <div class="flex items-center justify-between gap-2 mt-3">
+                <button onclick="stepEpisode(-1)" class="flex-1 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition">
+                  <i class="fas fa-backward-step mr-1"></i> Tập trước
+                </button>
+                <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer px-2">
+                  <input type="checkbox" id="auto-next-ep" checked class="rounded text-rose-500 focus:ring-0" />
+                  <span>Tự chuyển tập</span>
+                </label>
+                <button onclick="stepEpisode(1)" class="flex-1 py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition">
+                  Tập tiếp <i class="fas fa-forward-step ml-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- MULTI-QUALITY DOWNLOAD LINKS FOR ACTIVE EPISODE -->
+            <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-4">
+              <h4 class="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                <i class="fas fa-cloud-arrow-down text-emerald-400"></i>
+                <span>Tải Tập Này (Đã Giải Mã MP4 Không Logo)</span>
+              </h4>
+              <p class="text-[11px] text-slate-400 mb-3">
+                Luồng 1080p/720p được tự động mở khóa <code>spade_a</code> (CENC-AES-128-CTR) thành file MP4 chuẩn.
+              </p>
+
+              <!-- Single Download Progress Bar -->
+              <div id="single-dl-progress-wrap" class="hidden mb-3 p-3 rounded-lg bg-slate-800 border border-cyan-500/40">
+                <div class="flex justify-between text-xs font-semibold text-cyan-300 mb-1">
+                  <span id="single-dl-status">Đang tải & giải mã WebCrypto...</span>
+                  <span id="single-dl-percent">0%</span>
+                </div>
+                <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden">
+                  <div id="single-dl-bar" class="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-150" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <div id="active-ep-qualities" class="space-y-2">
+                <!-- Quality buttons injected by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN (7 cols): EPISODE GRID & BATCH DOWNLOAD MANAGER -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-4 sm:p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <!-- Header & Range Selection Tools -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-800">
+                  <div>
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                      <i class="fas fa-list-ol text-rose-400"></i>
+                      <span>Danh Sách Tập Phim & Tải Hàng Loạt</span>
+                    </h3>
+                    <p class="text-xs text-slate-400">Click vào số tập để phát/tải lẻ, hoặc tích chọn nhiều tập để tải trọn bộ</p>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-xs">
+                    <button onclick="selectEpisodePreset('all')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">Tất cả</button>
+                    <button onclick="selectEpisodePreset('1-10')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">1-10</button>
+                    <button onclick="selectEpisodePreset('1-30')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">1-30</button>
+                    <button onclick="selectEpisodePreset('none')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 border border-slate-700">Bỏ chọn</button>
+                  </div>
+                </div>
+
+                <!-- Custom Range Input Bar -->
+                <div class="flex flex-col sm:flex-row items-center gap-2 mb-4">
+                  <div class="relative w-full sm:flex-1">
+                    <input
+                      type="text"
+                      id="batch-range-input"
+                      oninput="applyRangeString(this.value)"
+                      placeholder="Nhập khoảng tập muốn tải hàng loạt (Ví dụ: 1-20, 25, 30-40)..."
+                      class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                    />
+                  </div>
+                  <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <span class="text-xs text-slate-400 whitespace-nowrap">Chất lượng:</span>
+                    <select id="batch-quality-select" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-2 focus:outline-none">
+                      <option value="1080p">1080p Full HD (Giải mã CENC)</option>
+                      <option value="720p">720p HD (Giải mã CENC)</option>
+                      <option value="540p">540p qHD (Nhẹ & Nét)</option>
+                      <option value="360p-h264">360p H.264 (Trực tiếp siêu tốc)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Episode Grid Scrollable -->
+                <div id="episodes-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-[340px] overflow-y-auto pr-1 py-1">
+                  <!-- Episode buttons injected by JS -->
+                </div>
+              </div>
+
+              <!-- BATCH DOWNLOAD ACTION BAR & QUEUE MONITOR -->
+              <div class="mt-5 pt-4 border-t border-slate-800">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div class="text-xs text-slate-300">
+                    Đã đánh dấu tải hàng loạt: <strong id="selected-ep-count" class="text-rose-400 text-sm">0</strong> tập
+                  </div>
+                  <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      id="btn-start-batch"
+                      onclick="startBatchDownload()"
+                      class="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 hover:opacity-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition"
+                    >
+                      <i class="fas fa-layer-group"></i>
+                      <span>Tải Hàng Loạt Tập Đã Chọn</span>
+                    </button>
+                    <button
+                      id="btn-stop-batch"
+                      onclick="stopBatchDownload()"
+                      class="hidden px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-rose-900/60 text-rose-300 font-bold text-xs border border-rose-500/40 transition"
+                    >
+                      <i class="fas fa-stop mr-1"></i> Dừng
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Batch Queue Progress Box -->
+                <div id="batch-progress-box" class="hidden mt-3 p-3.5 rounded-xl bg-slate-800/90 border border-slate-700">
+                  <div class="flex items-center justify-between text-xs mb-1.5">
+                    <span id="batch-status-text" class="font-semibold text-amber-300">Đang xử lý hàng đợi...</span>
+                    <span id="batch-counter-text" class="font-mono text-slate-300">0 / 0</span>
+                  </div>
+                  <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden mb-2">
+                    <div id="batch-progress-bar" class="h-full bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-400 transition-all duration-200" style="width: 0%"></div>
+                  </div>
+                  <div id="batch-log-list" class="text-[11px] text-slate-400 max-h-24 overflow-y-auto space-y-1 font-mono"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- DOUYIN / TIKTOK RESULT FALLBACK SECTION -->
+    <section id="douyin-result-wrapper" class="hidden max-w-4xl mx-auto mb-12 fade-in">
+      <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-5 sm:p-6 shadow-2xl">
+        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-700">
+          <div class="flex items-center gap-3">
+            <img id="dy-avatar" src="/favicon.svg" alt="Avatar" class="w-11 h-11 rounded-full border border-cyan-400 object-cover" />
+            <div>
+              <h3 id="dy-author" class="font-bold text-white text-sm">Douyin User</h3>
+              <span id="dy-provider" class="text-[11px] text-cyan-400">Provider: TikWM</span>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Douyin / TikTok Mode</span>
+        </div>
+        <p id="dy-title" class="text-sm text-slate-200 mb-4"></p>
+        <div id="dy-media-box" class="grid grid-cols-1 sm:grid-cols-2 gap-5 items-center"></div>
+      </div>
+    </section>
+
+    <!-- LIVE TRENDING & DISCOVERY SECTION (KHÁM PHÁ PHIM NGẮN HONGGUO HOT) -->
+    <section id="discover" class="mb-14 scroll-mt-20">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-400 mb-1">
+            <i class="fas fa-fire-flame-curved"></i> <span>Dữ Liệu Trực Tiếp Từ Hongguo</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white" data-i18n="discover_title">
+            Khám Phá Kho Phim Ngắn Hongguo Đang Hot
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">
+            Chạm vào bất kỳ bộ phim nào để phân tích danh sách tập, xem trực tuyến và tải xuống Full HD 1080p ngay lập tức.
+          </p>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="flex flex-wrap gap-1.5" id="discover-tabs">
+          <button onclick="loadDiscoverCategory('hot', 1, this)" class="discover-tab active px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500 text-white shadow transition">
+            🔥 Đang Thịnh Hành
+          </button>
+          <button onclick="loadDiscoverCategory('real-drama', 1, this)" class="discover-tab px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+            🎭 Phim Người Thật (真人剧)
+          </button>
+          <button onclick="loadDiscoverCategory('comic-drama', 1, this)" class="discover-tab px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+            🎨 Mạn Kịch (漫剧)
+          </button>
+          <button onclick="loadDiscoverCategory('ai-drama', 1, this)" class="discover-tab px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+            🤖 AI Đoản Kịch (AI剧)
+          </button>
+          <button onclick="loadDiscoverCategory('latest', 1, this)" class="discover-tab px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+            🆕 Mới Ra Mắt
+          </button>
+        </div>
+      </div>
+
+      <!-- Discover Grid -->
+      <div id="discover-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <!-- Skeleton Loader -->
+        <div class="col-span-full py-12 text-center text-slate-400 text-sm">
+          <i class="fas fa-circle-notch fa-spin text-rose-500 text-xl mb-2"></i>
+          <p>Đang tải danh sách phim ngắn thịnh hành từ Hongguo...</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="mt-6 flex items-center justify-center gap-3">
+        <button id="btn-disc-prev" onclick="changeDiscoverPage(-1)" disabled class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700 disabled:opacity-40 hover:bg-slate-700 transition">
+          <i class="fas fa-chevron-left mr-1"></i> Trang trước
+        </button>
+        <span id="disc-page-indicator" class="text-xs font-semibold text-slate-300 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700">
+          Trang 1
+        </span>
+        <button id="btn-disc-next" onclick="changeDiscoverPage(1)" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition">
+          Trang sau <i class="fas fa-chevron-right ml-1"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS & TECHNICAL HIGHLIGHTS -->
+    <section id="how-it-works" class="mb-14 scroll-mt-20">
+      <div class="text-center max-w-3xl mx-auto mb-8">
+        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Quy Trình Tự Động Hóa</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+          3 Bước Tải & Giải Mã Phim Ngắn Hongguo Không Logo
+        </h2>
+        <p class="text-slate-400 text-sm mt-2">
+          Không cần cài đặt ứng dụng hay phần mềm giả lập phức tạp. Mọi công đoạn xử lý khóa mật mã đều diễn ra tự động.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-6 relative overflow-hidden">
+          <div class="w-11 h-11 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 font-bold text-lg mb-4">
+            1
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">Sao Chép Link Hoặc Nhập Tên Phim</h3>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Lấy liên kết chia sẻ từ app <strong>红果免费短剧</strong> (dạng <code>novelquickapp.com/s/...</code>), đường dẫn web <code>hongguoduanju.com</code>, mã <code>series_id</code> hoặc gõ trực tiếp tên phim tiếng Trung vào thanh công cụ.
+          </p>
+        </div>
+
+        <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-6 relative overflow-hidden">
+          <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg mb-4">
+            2
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">Phân Giải Đa Tuyến & Trích Xuất Khóa</h3>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Hệ thống xoay tua qua 6 cụm máy chủ <strong>Fqnovel Preload</strong> và <strong>Hongguo Web SSR</strong> để lấy danh sách trọn bộ các tập cùng khóa <code>spade_a</code> cho độ phân giải 1080p Full HD.
+          </p>
+        </div>
+
+        <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-6 relative overflow-hidden">
+          <div class="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-lg mb-4">
+            3
+          </div>
+          <h3 class="text-base font-bold text-white mb-2">Giải Mã CENC-AES-CTR & Lưu MP4</h3>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Bộ giải mã <strong>WebCrypto API</strong> tích hợp sẵn sẽ tự động mở khóa luồng video mã hóa và tái tạo header MP4 tiêu chuẩn, cho phép bạn tải lẻ hoặc tải hàng loạt trọn bộ về máy.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITORIAL BLOG & IN-DEPTH ARTICLES SECTION (CHUẨN DUYỆT GOOGLE ADSENSE) -->
+    <section id="articles" class="mb-14 scroll-mt-20">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">
+            <i class="fas fa-book-journal-whills mr-1"></i> Chuyên Mục Kiến Thức & Phân Tích Chuyên Sâu
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+            Cẩm Nang Toàn Tập Về Hongguo Short Drama & Công Nghệ Video
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">
+            Tổng hợp các bài nghiên cứu kỹ thuật, hướng dẫn biên tập phụ đề và đánh giá xu hướng phim ngắn Trung Quốc mới nhất 2026.
+          </p>
+        </div>
+      </div>
+
+      <!-- Article Reader Panel (Hiển thị bài viết đầy đủ ngay trên trang) -->
+      <div id="article-reader-panel" class="bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 mb-8 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-700">
+          <div class="flex items-center gap-2">
+            <span id="reader-category" class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+              Kiến Thức Nền Tảng
+            </span>
+            <span id="reader-meta" class="text-xs text-slate-400">15/10/2026 · 8 phút đọc</span>
+          </div>
+          <span class="text-xs text-slate-400"><i class="fas fa-pen-nib text-amber-400 mr-1"></i><span id="reader-author">Ban Biên Tập</span></span>
+        </div>
+
+        <h3 id="reader-title" class="text-xl sm:text-2xl font-extrabold text-white mb-5 leading-snug"></h3>
+        <article id="reader-body" class="prose prose-invert max-w-none text-sm sm:text-base"></article>
+      </div>
+
+      <!-- 6 Article Cards Grid -->
+      <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Populated from window.HONGGUO_ARTICLES -->
+      </div>
+    </section>
+
+    <!-- RECENT DOWNLOAD HISTORY SECTION -->
+    <section id="history-section" class="mb-14">
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 sm:p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <i class="fas fa-clock-rotate-left text-cyan-400"></i>
+            <span>Lịch Sử Tra Cứu & Bộ Phim Đã Mở Gần Đây</span>
+          </h3>
+          <button onclick="clearHistory()" class="text-xs text-slate-400 hover:text-rose-400 transition">
+            <i class="fas fa-trash-can mr-1"></i> Xóa lịch sử
+          </button>
+        </div>
+        <div id="history-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <p class="text-xs text-slate-400 col-span-full">Chưa có bộ phim nào trong lịch sử phiên làm việc.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ ACCORDION SECTION -->
+    <section id="faq-section" class="max-w-4xl mx-auto mb-14 scroll-mt-20">
+      <div class="text-center mb-8">
+        <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Giải Đáp Thắc Mắc</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Câu Hỏi Thường Gặp (FAQ)</h2>
+      </div>
+
+      <div class="space-y-3">
+        <details class="group bg-slate-800/80 border border-slate-700 rounded-xl p-4 open:bg-slate-800 transition">
+          <summary class="font-bold text-sm sm:text-base text-white cursor-pointer flex items-center justify-between">
+            <span>1. Công cụ hỗ trợ những loại liên kết nào của Hongguo Short Drama?</span>
+            <i class="fas fa-chevron-down text-xs text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+            Hệ thống hỗ trợ đầy đủ mọi định dạng liên kết chia sẻ từ ứng dụng di động <strong>红果免费短剧</strong> (bao gồm <code>https://novelquickapp.com/s/...</code>, <code>changdunovel.com</code>), liên kết trình phát web <code>https://hongguoduanju.com/player/...</code>, mã định danh 19 chữ số (<code>series_id</code> / <code>book_id</code> / <code>vid</code>), tìm kiếm trực tiếp bằng từ khóa tên phim và hỗ trợ cả link Douyin/TikTok.
+          </p>
+        </details>
+
+        <details class="group bg-slate-800/80 border border-slate-700 rounded-xl p-4 transition">
+          <summary class="font-bold text-sm sm:text-base text-white cursor-pointer flex items-center justify-between">
+            <span>2. Sự khác nhau giữa bản tải "1080p Full HD (Giải mã CENC)" và "360p Web Direct (H.264)" là gì?</span>
+            <i class="fas fa-chevron-down text-xs text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+            Bản <strong>1080p / 720p</strong> được lấy từ cụm máy chủ App Preload với độ nét cao nhất (chuẩn nén HEVC/ByteVC1) và được công cụ của chúng tôi tự động giải mã khóa <code>spade_a</code> (CENC-AES-128-CTR) thành file MP4 chuẩn. Trong khi đó, bản <strong>360p Web Direct</strong> sử dụng codec H.264 không mã hóa, ưu tiên tốc độ tải tức thì và phát trực tiếp trên mọi trình duyệt đời cũ.
+          </p>
+        </details>
+
+        <details class="group bg-slate-800/80 border border-slate-700 rounded-xl p-4 transition">
+          <summary class="font-bold text-sm sm:text-base text-white cursor-pointer flex items-center justify-between">
+            <span>3. Tại sao khi mở file 1080p trên Windows Media Player cũ chỉ có tiếng mà không có hình?</span>
+            <i class="fas fa-chevron-down text-xs text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+            Do video 1080p gốc của Hongguo sử dụng chuẩn nén <strong>HEVC (H.265 / hvc1)</strong>. Nếu máy tính Windows của bạn chưa cài đặt HEVC Video Extensions, hãy mở bằng <strong>VLC Media Player</strong>, <strong>PotPlayer</strong>, <strong>CapCut</strong> hoặc tải bản <strong>360p H.264</strong> để tương thích 100%.
+          </p>
+        </details>
+
+        <details class="group bg-slate-800/80 border border-slate-700 rounded-xl p-4 transition">
+          <summary class="font-bold text-sm sm:text-base text-white cursor-pointer flex items-center justify-between">
+            <span>4. Làm sao để triển khai công cụ này lên Cloudflare Pages/Workers hoặc Render.com?</span>
+            <i class="fas fa-chevron-down text-xs text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <p class="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+            Mã nguồn đã được đóng gói sẵn cấu trúc chuẩn <strong>Cloudflare Pages Functions</strong> (<code>functions/api/*</code> và <code>_worker.js</code>) giúp chạy miễn phí 100% trên mạng lưới Cloudflare Edge. Ngoài ra, dự án còn kèm theo <code>app.py</code> và <code>render.yaml</code> để bạn có thể triển khai thêm máy chủ Python trên <strong>Render.com</strong> nếu cần.
+          </p>
+        </details>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER (CHUẨN CẤU TRÚC GOOGLE ADSENSE: ĐẦY ĐỦ LIÊN KẾT PHÁP LÝ & BẢN QUYỀN) -->
+  <footer class="bg-slate-950 border-t border-slate-800/90 text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <!-- Col 1: Brand -->
+        <div class="md:col-span-1">
+          <div class="flex items-center space-x-2.5 mb-3">
+            <img src="/favicon.svg" alt="Logo" class="w-7 h-7" />
+            <span class="text-base font-extrabold text-white">Hongguo <span class="text-rose-500">PRO</span></span>
+          </div>
+          <p class="text-slate-400 leading-relaxed mb-3">
+            Nền tảng tra cứu thông tin, khám phá bảng xếp hạng và hỗ trợ tải & giải mã video phim ngắn Hongguo Short Drama (红果免费短剧) tốc độ cao trên hạ tầng Cloudflare Edge.
+          </p>
+          <p class="text-[11px] text-slate-500">
+            Tuyên bố: Website không lưu trữ bất kỳ tệp video có bản quyền nào trên máy chủ.
+          </p>
+        </div>
+
+        <!-- Col 2: Quick Links -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider mb-3">Tính Năng Chính</h4>
+          <ul class="space-y-2">
+            <li><a href="#tool-section" class="hover:text-rose-400 transition">Tải Video Hongguo 1080p</a></li>
+            <li><a href="#discover" onclick="loadDiscoverCategory('hot', 1)" class="hover:text-rose-400 transition">Bảng Xếp Hạng Đoản Kịch Hot</a></li>
+            <li><a href="#discover" onclick="loadDiscoverCategory('real-drama', 1)" class="hover:text-rose-400 transition">Phim Ngắn Người Thật (真人剧)</a></li>
+            <li><a href="#discover" onclick="loadDiscoverCategory('comic-drama', 1)" class="hover:text-rose-400 transition">Mạn Kịch & Hoạt Hình (漫剧)</a></li>
+            <li><a href="#discover" onclick="loadDiscoverCategory('ai-drama', 1)" class="hover:text-rose-400 transition">AI Short Drama (AI剧)</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Knowledge Articles -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider mb-3">Bài Viết Chuyên Sâu</h4>
+          <ul class="space-y-2">
+            <li><a href="#articles" onclick="openArticle('what-is-hongguo')" class="hover:text-rose-400 transition">Hongguo Short Drama là gì?</a></li>
+            <li><a href="#articles" onclick="openArticle('how-to-download-1080p')" class="hover:text-rose-400 transition">Hướng dẫn tải trọn bộ 1080p</a></li>
+            <li><a href="#articles" onclick="openArticle('cenc-hevc-decryption')" class="hover:text-rose-400 transition">Giải mã CENC-AES-CTR & HEVC</a></li>
+            <li><a href="#articles" onclick="openArticle('top-hongguo-dramas-2026')" class="hover:text-rose-400 transition">Top phim ngắn Hongguo 2026</a></li>
+            <li><a href="#articles" onclick="openArticle('subtitle-translation-guide')" class="hover:text-rose-400 transition">Làm phụ đề Vietsub bằng Whisper AI</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Legal & Compliance (AdSense Required) -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider mb-3">Thông Tin & Pháp Lý</h4>
+          <ul class="space-y-2">
+            <li><button onclick="openLegalModal('about')" class="hover:text-rose-400 transition text-left">Về Chúng Tôi (About Us)</button></li>
+            <li><button onclick="openLegalModal('privacy')" class="hover:text-rose-400 transition text-left">Chính Sách Bảo Mật (Privacy Policy)</button></li>
+            <li><button onclick="openLegalModal('terms')" class="hover:text-rose-400 transition text-left">Điều Khoản Dịch Vụ (Terms of Use)</button></li>
+            <li><button onclick="openLegalModal('dmca')" class="hover:text-rose-400 transition text-left">Bản Quyền & DMCA Policy</button></li>
+            <li><button onclick="openLegalModal('contact')" class="hover:text-rose-400 transition text-left">Liên Hệ & Hỗ Trợ (Contact Us)</button></li>
+            <li><a href="/sitemap.xml" target="_blank" class="hover:text-rose-400 transition">Sơ đồ trang (Sitemap XML)</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p>© 2026 Hongguo Pro Video Downloader. All rights reserved. Không liên kết chính thức với ByteDance hay 红果短剧.</p>
+        <div class="flex items-center space-x-4">
+          <button onclick="openLegalModal('privacy')" class="hover:text-white">Privacy</button>
+          <span>·</span>
+          <button onclick="openLegalModal('terms')" class="hover:text-white">Terms</button>
+          <span>·</span>
+          <button onclick="openLegalModal('dmca')" class="hover:text-white">DMCA</button>
+          <span>·</span>
+          <button onclick="openLegalModal('contact')" class="hover:text-white">Contact</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- LEGAL / POLICY MODAL -->
+  <div id="legal-modal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+        <h3 id="legal-modal-title" class="text-lg font-bold text-white">Thông Tin Pháp Lý</h3>
+        <button onclick="closeLegalModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+      <div id="legal-modal-body" class="p-6 overflow-y-auto text-sm leading-relaxed space-y-3"></div>
+      <div class="px-6 py-3 border-t border-slate-800 flex justify-end">
+        <button onclick="closeLegalModal()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold">
+          Đóng cửa sổ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API SETTINGS MODAL -->
+  <div id="settings-modal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fas fa-sliders text-rose-400"></i>
+          <span>Cấu Hình Nguồn API & Render.com Backend</span>
+        </h3>
+        <button onclick="toggleSettingsModal(false)" class="text-slate-400 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1">Chế độ Giải mã CENC-AES-128-CTR (1080p/720p):</label>
+          <select id="setting-decrypt-mode" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+            <option value="client">⚡ Giải mã trên Trình duyệt (WebCrypto - Không giới hạn CPU Cloudflare)</option>
+            <option value="server">🖥️ Giải mã trên Server Proxy (/api/download - Tải trực tiếp 1 chạm)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1">Custom API / Render.com Python URL (Tùy chọn):</label>
+          <input
+            type="text"
+            id="setting-custom-api"
+            placeholder="Ví dụ: https://your-hongguo-app.onrender.com/api/download"
+            class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500"
+          />
+          <p class="text-[11px] text-slate-400 mt-1">
+            Mặc định để trống hệ thống sẽ dùng trực tiếp Cloudflare Edge + 6 Mirror Fqnovel miễn phí.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-semibold text-slate-300 block mb-1">Apihz ID (Douyin fallback):</label>
+            <input type="text" id="setting-apihz-id" placeholder="10003120" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white" />
+          </div>
+          <div>
+            <label class="font-semibold text-slate-300 block mb-1">Apihz Key:</label>
+            <input type="text" id="setting-apihz-key" placeholder="bfb75036..." class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white" />
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="toggleSettingsModal(false)" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Hủy</button>
+        <button onclick="saveSettings()" class="px-5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold">Lưu Cấu Hình</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GDPR / ADSENSE COOKIE CONSENT BANNER -->
+  <div id="cookie-banner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-40 hidden bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-2xl p-4 shadow-2xl">
+    <div class="flex items-start gap-3">
+      <i class="fas fa-cookie-bite text-amber-400 text-xl mt-0.5"></i>
+      <div class="text-xs text-slate-300 leading-relaxed">
+        <p class="font-bold text-white mb-1">Thông báo Cookie & Quyền riêng tư</p>
+        <p>Chúng tôi sử dụng bộ nhớ cục bộ (localStorage) và cookie tiêu chuẩn để lưu tùy chọn giao diện và phân phối nội dung phù hợp theo <button onclick="openLegalModal('privacy')" class="text-rose-400 underline">Chính sách bảo mật</button>.</p>
+        <div class="mt-3 flex items-center gap-2">
+          <button onclick="acceptCookies()" class="px-4 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-bold transition">Đồng ý</button>
+          <button onclick="acceptCookies()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">Chỉ Cookie thiết yếu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-box" class="fixed bottom-5 right-5 z-50 hidden px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-semibold shadow-2xl flex items-center gap-2">
+    <i class="fas fa-check-circle text-emerald-400"></i>
+    <span id="toast-text">Thông báo</span>
+  </div>
+
+  <!-- LOAD ARTICLES, LEGAL PAGES & CLIENT WEBCRYPTO DECRYPTOR -->
+  <script src="/articles.js"></script>
+
+  <!-- MAIN APPLICATION LOGIC -->
+  <script>
+    // ==================== STATE QUẢN LÝ ====================
+    let currentSeries = null;
+    let currentActiveEpisode = null;
+    let currentStreamData = null;
+    let selectedEpisodeIndexes = new Set();
+    let batchAborted = false;
+    let currentDiscoverCategory = "hot";
+    let currentDiscoverPage = 1;
+
+    // ==================== KHỞI TẠO TRANG ====================
+    window.addEventListener("DOMContentLoaded", () => {
+      initTheme();
+      initSettings();
+      renderArticlesSection();
+      renderHistory();
+      loadDiscoverCategory("hot", 1);
+      initCookieBanner();
+
+      const inputEl = document.getElementById("url-input");
+      const clearBtn = document.getElementById("btn-clear");
+      inputEl.addEventListener("input", () => {
+        clearBtn.classList.toggle("hidden", !inputEl.value.trim());
+      });
+
+      // Tự động chuyển tập khi xem hết
+      const player = document.getElementById("hongguo-player");
+      player.addEventListener("ended", () => {
+        if (document.getElementById("auto-next-ep").checked) {
+          stepEpisode(1);
+        }
+      });
+    });
+
+    function showToast(msg) {
+      const box = document.getElementById("toast-box");
+      document.getElementById("toast-text").textContent = msg;
+      box.classList.remove("hidden");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => box.classList.add("hidden"), 3200);
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function clearInput() {
+      const el = document.getElementById("url-input");
+      el.value = "";
+      document.getElementById("btn-clear").classList.add("hidden");
+      el.focus();
+    }
+
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          const el = document.getElementById("url-input");
+          el.value = text;
+          document.getElementById("btn-clear").classList.remove("hidden");
+          showToast("Đã dán nội dung từ bộ nhớ tạm!");
+        }
+      } catch {
+        showToast("Vui lòng nhấn Ctrl+V hoặc giữ vào ô nhập để dán.");
+      }
+    }
+
+    function quickTry(val) {
+      const el = document.getElementById("url-input");
+      el.value = val;
+      document.getElementById("btn-clear").classList.remove("hidden");
+      handleFetch();
+    }
+
+    function proxyImg(url) {
+      if (!url) return "/favicon.svg";
+      return `/api/proxy?url=${encodeURIComponent(url)}`;
+    }
+
+    function formatBytes(bytes) {
+      const n = Number(bytes) || 0;
+      if (n <= 0) return "";
+      return (n / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function formatNumber(num) {
+      const n = Number(num) || 0;
+      if (n <= 0) return "0";
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+      if (n >= 1000) return (n / 1000).toFixed(1) + "K";
+      return String(n);
+    }
+
+    // ==================== PHÂN TÍCH LINK / ID / TỪ KHÓA ====================
+    async function handleFetch() {
+      const raw = document.getElementById("url-input").value.trim();
+      if (!raw) {
+        showToast("Vui lòng nhập link Hongguo, mã series_id hoặc tên phim!");
+        return;
+      }
+
+      const route = document.getElementById("route-select").value || "auto";
+      const customApi = localStorage.getItem("hg_custom_api") || "";
+      const apihzId = localStorage.getItem("hg_apihz_id") || "";
+      const apihzKey = localStorage.getItem("hg_apihz_key") || "";
+
+      hideError();
+      document.getElementById("loading-box").classList.remove("hidden");
+      document.getElementById("btn-fetch").disabled = true;
+
+      try {
+        const res = await fetch("/api/parse", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: raw, provider: route, customApi, apihzId, apihzKey })
+        });
+        const json = await res.json();
+        document.getElementById("loading-box").classList.add("hidden");
+        document.getElementById("btn-fetch").disabled = false;
+
+        if (!json.success) {
+          showError(json.message || "Không thể phân tích dữ liệu.");
+          return;
+        }
+
+        // 1. Chế độ Tìm kiếm theo từ khóa
+        if (json.mode === "search" && json.data) {
+          renderSearchResults(json.data);
+          return;
+        }
+
+        // 2. Chế độ Douyin / TikTok
+        if (json.mode === "douyin" && json.data) {
+          renderDouyinResult(json.data);
+          return;
+        }
+
+        // 3. Chế độ Bộ phim Hongguo Short Drama
+        if (json.data) {
+          renderHongguoSeries(json.data);
+          saveToHistory(json.data);
+        }
+      } catch (err) {
+        document.getElementById("loading-box").classList.add("hidden");
+        document.getElementById("btn-fetch").disabled = false;
+        showError(`Lỗi kết nối máy chủ: ${err.message}`);
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById("error-message").textContent = msg;
+      document.getElementById("error-box").classList.remove("hidden");
+    }
+
+    function hideError() {
+      document.getElementById("error-box").classList.add("hidden");
+    }
+
+    // ==================== HIỂN THỊ KẾT QUẢ TÌM KIẾM PHIM ====================
+    function renderSearchResults(searchData) {
+      document.getElementById("series-result-wrapper").classList.add("hidden");
+      document.getElementById("douyin-result-wrapper").classList.add("hidden");
+
+      const wrap = document.getElementById("search-results-wrapper");
+      document.getElementById("search-keyword-label").textContent = `"${searchData.keyword}"`;
+      const list = searchData.results || [];
+      document.getElementById("search-count-badge").textContent = `${list.length} bộ phim`;
+
+      const grid = document.getElementById("search-results-grid");
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-sm">Không tìm thấy bộ phim nào khớp với từ khóa "${searchData.keyword}". Hãy thử từ khóa tiếng Trung như 总裁, 重生, 古装...</div>`;
+      } else {
+        grid.innerHTML = list.map(item => createDramaCardHtml(item)).join("");
+      }
+
+      wrap.classList.remove("hidden");
+      wrap.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function createDramaCardHtml(item) {
+      const safeTitle = (item.title || "Phim ngắn").replace(/"/g, "&quot;");
+      const tagsHtml = (item.tags || []).slice(0, 2).map(t =>
+        `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-slate-300 border border-slate-700">${t}</span>`
+      ).join("");
+
+      return `
+        <div onclick="openSeriesById('${item.series_id}')" class="group cursor-pointer bg-slate-900/90 border border-slate-800 hover:border-rose-500/60 rounded-xl overflow-hidden flex flex-col justify-between transition-all hover:-translate-y-1 shadow-lg">
+          <div>
+            <div class="relative aspect-[3/4] bg-slate-800 overflow-hidden">
+              <img src="${proxyImg(item.cover)}" alt="${safeTitle}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/favicon.svg'" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent"></div>
+              ${item.rank ? `<span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-extrabold shadow">TOP ${item.rank}</span>` : ""}
+              <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-amber-400 text-[10px] font-bold border border-amber-500/30">
+                ${item.status_text || (item.episode_cnt ? `Trọn bộ ${item.episode_cnt} tập` : "Phim ngắn")}
+              </span>
+            </div>
+            <div class="p-3">
+              <h3 class="font-bold text-white text-xs sm:text-sm group-hover:text-rose-400 transition-colors clamp-2 mb-1.5">${safeTitle}</h3>
+              <div class="flex flex-wrap gap-1 mb-1.5">${tagsHtml}</div>
+              <p class="text-[11px] text-slate-400 clamp-2">${item.intro || "Nhấn để xem toàn bộ danh sách tập và tải MP4 1080p."}</p>
+            </div>
+          </div>
+          <div class="px-3 pb-3 pt-1">
+            <span class="w-full py-1.5 rounded-lg bg-rose-500/15 group-hover:bg-rose-500 text-rose-300 group-hover:text-white text-[11px] font-bold flex items-center justify-center gap-1.5 border border-rose-500/30 transition">
+              <i class="fas fa-download text-[10px]"></i> Xem & Tải Trọn Bộ
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    function openSeriesById(seriesId) {
+      if (!seriesId) return;
+      const el = document.getElementById("url-input");
+      el.value = seriesId;
+      document.getElementById("btn-clear").classList.remove("hidden");
+      scrollToTop();
+      handleFetch();
+    }
+
+    // ==================== HIỂN THỊ BỘ PHIM HONGGUO & DANH SÁCH TẬP ====================
+    function renderHongguoSeries(data) {
+      currentSeries = data;
+      selectedEpisodeIndexes.clear();
+
+      document.getElementById("search-results-wrapper").classList.add("hidden");
+      document.getElementById("douyin-result-wrapper").classList.add("hidden");
+
+      document.getElementById("series-cover").src = proxyImg(data.cover);
+      document.getElementById("series-status-badge").textContent = data.status_text || `Trọn bộ ${data.total_episodes} tập`;
+      document.getElementById("series-provider-badge").textContent = data.provider || "fqnovel";
+      document.getElementById("series-id-badge").textContent = `ID: ${data.series_id || "---"}`;
+      document.getElementById("series-title").textContent = data.title || "Phim Ngắn Hongguo";
+      document.getElementById("series-intro").textContent = data.intro || "Bộ phim ngắn trên nền tảng Hongguo Free Short Drama (红果免费短剧).";
+
+      document.getElementById("series-total-eps").textContent = data.total_episodes || (data.episodes || []).length;
+      document.getElementById("series-views").textContent = formatNumber(data.stats?.views);
+      document.getElementById("series-likes").textContent = formatNumber(data.stats?.likes);
+      document.getElementById("series-favs").textContent = formatNumber(data.stats?.favorites);
+
+      // Tags
+      const tagsEl = document.getElementById("series-tags");
+      tagsEl.innerHTML = (data.tags || []).map(t =>
+        `<span onclick="quickTry('${t}')" class="cursor-pointer px-2.5 py-0.5 rounded-full text-xs bg-slate-900 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 border border-slate-700 transition">#${t}</span>`
+      ).join("");
+
+      // Actors
+      const actorsWrap = document.getElementById("series-actors-wrap");
+      const actorsEl = document.getElementById("series-actors");
+      if (Array.isArray(data.celebrities) && data.celebrities.length > 0) {
+        actorsWrap.classList.remove("hidden");
+        actorsEl.innerHTML = data.celebrities.map(c => `
+          <div class="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-700 text-xs">
+            <img src="${proxyImg(c.avatar)}" alt="${c.name}" class="w-6 h-6 rounded-full object-cover" onerror="this.src='/favicon.svg'" />
+            <div>
+              <span class="font-semibold text-white">${c.name}</span>
+              ${c.role ? `<span class="text-[10px] text-slate-400 ml-1">(${c.role})</span>` : ""}
+            </div>
+          </div>
+        `).join("");
+      } else {
+        actorsWrap.classList.add("hidden");
+      }
+
+      // Render Episode Grid
+      renderEpisodesGrid();
+
+      // Render Active Episode & Stream
+      const firstEp = data.active_episode || (data.episodes && data.episodes[0]);
+      if (firstEp) {
+        currentActiveEpisode = firstEp;
+        updateActiveEpisodeHighlight();
+        if (data.active_stream) {
+          renderEpisodeStreamPanel(firstEp, data.active_stream);
+        } else {
+          selectAndLoadEpisode(firstEp.vid_index);
+        }
+      }
+
+      const wrap = document.getElementById("series-result-wrapper");
+      wrap.classList.remove("hidden");
+      wrap.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderEpisodesGrid() {
+      const grid = document.getElementById("episodes-grid");
+      const eps = currentSeries?.episodes || [];
+      grid.innerHTML = eps.map(ep => {
+        const idx = ep.vid_index;
+        const isSelected = selectedEpisodeIndexes.has(idx);
+        const isActive = currentActiveEpisode && currentActiveEpisode.vid_index === idx;
+        return `
+          <div
+            id="ep-btn-${idx}"
+            class="relative group rounded-lg border text-xs font-bold transition flex items-center justify-between px-2 py-2 cursor-pointer select-none ${
+              isActive
+                ? "bg-rose-600 text-white border-rose-400 shadow-md"
+                : isSelected
+                ? "bg-amber-500/20 text-amber-300 border-amber-500/50"
+                : "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
+            }"
+            onclick="selectAndLoadEpisode(${idx})"
+          >
+            <span>Tập ${idx}</span>
+            <input
+              type="checkbox"
+              ${isSelected ? "checked" : ""}
+              onclick="event.stopPropagation(); toggleEpisodeBatchSelect(${idx}, this.checked)"
+              title="Đánh dấu tải hàng loạt"
+              class="w-3.5 h-3.5 rounded text-rose-500 focus:ring-0 cursor-pointer"
+            />
+          </div>
+        `;
+      }).join("");
+      document.getElementById("selected-ep-count").textContent = selectedEpisodeIndexes.size;
+    }
+
+    function updateActiveEpisodeHighlight() {
+      renderEpisodesGrid();
+    }
+
+    function toggleEpisodeBatchSelect(epIndex, checked) {
+      if (checked) selectedEpisodeIndexes.add(epIndex);
+      else selectedEpisodeIndexes.delete(epIndex);
+      renderEpisodesGrid();
+    }
+
+    function selectEpisodePreset(preset) {
+      const eps = currentSeries?.episodes || [];
+      selectedEpisodeIndexes.clear();
+      if (preset === "all") {
+        eps.forEach(e => selectedEpisodeIndexes.add(e.vid_index));
+      } else if (preset === "1-10") {
+        eps.filter(e => e.vid_index >= 1 && e.vid_index <= 10).forEach(e => selectedEpisodeIndexes.add(e.vid_index));
+      } else if (preset === "1-30") {
+        eps.filter(e => e.vid_index >= 1 && e.vid_index <= 30).forEach(e => selectedEpisodeIndexes.add(e.vid_index));
+      }
+      renderEpisodesGrid();
+    }
+
+    function applyRangeString(str) {
+      selectedEpisodeIndexes.clear();
+      const maxEp = (currentSeries?.episodes || []).length;
+      const parts = String(str || "").split(",");
+      for (const p of parts) {
+        const t = p.trim();
+        if (!t) continue;
+        const mRange = t.match(/^(\d+)\s*-\s*(\d+)$/);
+        if (mRange) {
+          const a = Math.max(1, parseInt(mRange[1], 10));
+          const b = Math.min(maxEp, parseInt(mRange[2], 10));
+          for (let i = a; i <= b; i++) selectedEpisodeIndexes.add(i);
+        } else if (/^\d+$/.test(t)) {
+          const v = parseInt(t, 10);
+          if (v >= 1 && v <= maxEp) selectedEpisodeIndexes.add(v);
+        }
+      }
+      renderEpisodesGrid();
+    }
+
+    async function selectAndLoadEpisode(epIndex) {
+      if (!currentSeries || !Array.isArray(currentSeries.episodes)) return;
+      const ep = currentSeries.episodes.find(e => e.vid_index === epIndex);
+      if (!ep) return;
+
+      currentActiveEpisode = ep;
+      updateActiveEpisodeHighlight();
+
+      document.getElementById("active-ep-title").textContent = `Tập ${ep.vid_index}${ep.title && !ep.title.startsWith("Tập") ? ` - ${ep.title.slice(0, 28)}` : ""}`;
+      document.getElementById("active-ep-vid").textContent = `VID: ${ep.vid}`;
+      document.getElementById("active-ep-qualities").innerHTML = `
+        <div class="p-4 text-center text-xs text-slate-400">
+          <i class="fas fa-circle-notch fa-spin text-rose-400 mr-1.5"></i> Đang lấy luồng video 1080p & khóa CENC cho Tập ${ep.vid_index}...
+        </div>
+      `;
+
+      const route = document.getElementById("route-select").value || "auto";
+      try {
+        const res = await fetch(`/api/episode?vid=${encodeURIComponent(ep.vid)}&series_id=${encodeURIComponent(currentSeries.series_id)}&title=${encodeURIComponent(currentSeries.title)}&index=${ep.vid_index}&route=${encodeURIComponent(route)}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          renderEpisodeStreamPanel(ep, json.data);
+        } else {
+          document.getElementById("active-ep-qualities").innerHTML = `<div class="text-xs text-rose-400 p-2">Lỗi lấy link tập ${ep.vid_index}: ${json.message || "Không xác định"}</div>`;
+        }
+      } catch (e) {
+        document.getElementById("active-ep-qualities").innerHTML = `<div class="text-xs text-rose-400 p-2">Lỗi kết nối: ${e.message}</div>`;
+      }
+    }
+
+    function stepEpisode(delta) {
+      if (!currentSeries || !currentActiveEpisode) return;
+      const nextIdx = currentActiveEpisode.vid_index + delta;
+      const exists = currentSeries.episodes.some(e => e.vid_index === nextIdx);
+      if (exists) {
+        selectAndLoadEpisode(nextIdx);
+      } else {
+        showToast(delta > 0 ? "Đã ở tập cuối cùng!" : "Đã ở tập đầu tiên!");
+      }
+    }
+
+    function renderEpisodeStreamPanel(ep, streamData) {
+      currentStreamData = streamData;
+      document.getElementById("active-ep-title").textContent = `Tập ${ep.vid_index}`;
+      document.getElementById("active-ep-vid").textContent = `VID: ${ep.vid}`;
+
+      // Cài đặt trình phát: Ưu tiên phát luồng H.264 Web Direct (proxy_preview_url) để 100% trình duyệt có hình + tiếng ngay lập tức
+      const player = document.getElementById("hongguo-player");
+      const previewSrc = streamData.proxy_preview_url || (streamData.qualities && streamData.qualities[0]?.proxy_stream_url) || "";
+      if (previewSrc && player.src !== location.origin + previewSrc) {
+        player.src = previewSrc;
+      }
+
+      const qualities = streamData.qualities || [];
+      const container = document.getElementById("active-ep-qualities");
+
+      container.innerHTML = qualities.map((q, idx) => {
+        const sizeLabel = formatBytes(q.size);
+        const safeSeriesTitle = (currentSeries?.title || "hongguo").replace(/[\\/:*?"<>|]/g, "_").slice(0, 45);
+        const filename = `${safeSeriesTitle}_Tap_${String(ep.vid_index).padStart(3, "0")}_${q.definition || "hd"}.mp4`;
+        const is1080 = q.score >= 1080;
+
+        return `
+          <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-800/90 border ${is1080 ? "border-rose-500/40" : "border-slate-700"}">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-xs text-white">${q.label}</span>
+                ${sizeLabel ? `<span class="px-1.5 py-0.5 rounded bg-slate-900 text-[10px] font-mono text-cyan-300">${sizeLabel}</span>` : ""}
+                <span class="px-1.5 py-0.5 rounded bg-slate-900 text-[10px] text-slate-400 uppercase">${q.codec || "mp4"}</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate mt-0.5">
+                ${q.encrypted ? "🔒 CENC-AES-CTR (Tự động giải mã khóa spade_a)" : "✅ H.264 Trực tiếp (Không mã hóa)"}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <button
+                onclick="downloadAndDecryptEpisode(${idx}, '${filename.replace(/'/g, "\\'")}')"
+                class="px-3 py-1.5 rounded-lg ${is1080 ? "bg-gradient-to-r from-rose-500 to-orange-500 text-white" : "bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 border border-emerald-500/30"} text-xs font-bold flex items-center gap-1 transition"
+              >
+                <i class="fas fa-download text-[11px]"></i>
+                <span>Tải MP4</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // ==================== TẢI & GIẢI MÃ CENC-AES-CTR (CLIENT WEBCRYPTO + SERVER PROXY) ====================
+    async function downloadAndDecryptEpisode(qualityIdx, filename) {
+      if (!currentStreamData || !currentStreamData.qualities[qualityIdx]) return;
+      const q = currentStreamData.qualities[qualityIdx];
+      const decryptMode = localStorage.getItem("hg_decrypt_mode") || "client";
+
+      // Nếu luồng không mã hóa (như 360p-h264) hoặc người dùng chọn chế độ Server Proxy
+      if (!q.encrypted || !q.key_hex || decryptMode === "server") {
+        showToast(`Đang bắt đầu tải: ${filename}`);
+        const a = document.createElement("a");
+        a.href = q.proxy_download_url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return;
+      }
+
+      // Chế độ Client WebCrypto: Tải raw stream qua proxy + Giải mã CENC-AES-CTR ngay trong trình duyệt
+      const wrap = document.getElementById("single-dl-progress-wrap");
+      const statusEl = document.getElementById("single-dl-status");
+      const pctEl = document.getElementById("single-dl-percent");
+      const barEl = document.getElementById("single-dl-bar");
+
+      wrap.classList.remove("hidden");
+      statusEl.textContent = `Đang tải luồng ${q.definition.toUpperCase()}...`;
+      pctEl.textContent = "0%";
+      barEl.style.width = "0%";
+
+      try {
+        const rawUrl = `/api/download?url=${encodeURIComponent(q.url)}&raw=1`;
+        const resp = await fetch(rawUrl);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+        const total = parseInt(resp.headers.get("content-length") || "0", 10) || q.size || 0;
+        const reader = resp.body.getReader();
+        const chunks = [];
+        let received = 0;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+          if (total > 0) {
+            const pct = Math.min(95, Math.round((received / total) * 95));
+            pctEl.textContent = `${pct}%`;
+            barEl.style.width = `${pct}%`;
+          }
+        }
+
+        const encryptedBytes = new Uint8Array(received);
+        let pos = 0;
+        for (const ch of chunks) {
+          encryptedBytes.set(ch, pos);
+          pos += ch.length;
+        }
+
+        statusEl.textContent = "Đang mở khóa CENC-AES-128-CTR (WebCrypto)...";
+        pctEl.textContent = "98%";
+        barEl.style.width = "98%";
+
+        const decryptedBytes = await window.HongguoClientDecryptor.decryptMp4Bytes(encryptedBytes, q.key_hex);
+
+        statusEl.textContent = "Hoàn tất giải mã MP4!";
+        pctEl.textContent = "100%";
+        barEl.style.width = "100%";
+
+        const blob = new Blob([decryptedBytes], { type: "video/mp4" });
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+        setTimeout(() => wrap.classList.add("hidden"), 2500);
+        showToast(`Đã tải & giải mã thành công: ${filename}`);
+      } catch (err) {
+        wrap.classList.add("hidden");
+        showToast(`Chuyển sang tải trực tiếp qua Server Proxy...`);
+        window.location.href = q.proxy_download_url;
+      }
+    }
+
+    // ==================== TẢI HÀNG LOẠT NHIỀU TẬP (BATCH DOWNLOADER) ====================
+    async function startBatchDownload() {
+      if (!currentSeries || selectedEpisodeIndexes.size === 0) {
+        showToast("Vui lòng tích chọn ít nhất 1 tập phim để tải hàng loạt!");
+        return;
+      }
+
+      const sortedIndexes = Array.from(selectedEpisodeIndexes).sort((a, b) => a - b);
+      const targetDef = document.getElementById("batch-quality-select").value || "1080p";
+      const route = document.getElementById("route-select").value || "auto";
+
+      batchAborted = false;
+      document.getElementById("btn-start-batch").classList.add("hidden");
+      document.getElementById("btn-stop-batch").classList.remove("hidden");
+
+      const box = document.getElementById("batch-progress-box");
+      const statusText = document.getElementById("batch-status-text");
+      const counterText = document.getElementById("batch-counter-text");
+      const bar = document.getElementById("batch-progress-bar");
+      const logList = document.getElementById("batch-log-list");
+
+      box.classList.remove("hidden");
+      logList.innerHTML = "";
+
+      const total = sortedIndexes.length;
+      let completed = 0;
+
+      function addBatchLog(msg) {
+        const div = document.createElement("div");
+        div.textContent = msg;
+        logList.prepend(div);
+      }
+
+      for (const epIdx of sortedIndexes) {
+        if (batchAborted) {
+          addBatchLog("⏹️ Đã dừng hàng đợi theo yêu cầu người dùng.");
+          break;
+        }
+
+        const ep = currentSeries.episodes.find(e => e.vid_index === epIdx);
+        if (!ep) continue;
+
+        statusText.textContent = `Đang xử lý Tập ${epIdx} (${targetDef})...`;
+        counterText.textContent = `${completed} / ${total}`;
+
+        try {
+          const res = await fetch(`/api/episode?vid=${encodeURIComponent(ep.vid)}&series_id=${encodeURIComponent(currentSeries.series_id)}&title=${encodeURIComponent(currentSeries.title)}&index=${epIdx}&route=${encodeURIComponent(route)}`);
+          const json = await res.json();
+          if (!json.success || !json.data?.qualities?.length) {
+            throw new Error(json.message || "Không lấy được luồng video");
+          }
+
+          const quals = json.data.qualities;
+          const chosen = quals.find(q => q.definition === targetDef) || quals[0];
+          const safeSeriesTitle = (currentSeries.title || "hongguo").replace(/[\\/:*?"<>|]/g, "_").slice(0, 45);
+          const filename = `${safeSeriesTitle}_Tap_${String(epIdx).padStart(3, "0")}_${chosen.definition}.mp4`;
+
+          if (chosen.encrypted && chosen.key_hex) {
+            const rawResp = await fetch(`/api/download?url=${encodeURIComponent(chosen.url)}&raw=1`);
+            const rawBuf = new Uint8Array(await rawResp.arrayBuffer());
+            const decBuf = await window.HongguoClientDecryptor.decryptMp4Bytes(rawBuf, chosen.key_hex);
+            const blob = new Blob([decBuf], { type: "video/mp4" });
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
+          } else {
+            const a = document.createElement("a");
+            a.href = chosen.proxy_download_url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          }
+
+          completed++;
+          const pct = Math.round((completed / total) * 100);
+          counterText.textContent = `${completed} / ${total}`;
+          bar.style.width = `${pct}%`;
+          addBatchLog(`✅ Tập ${epIdx}: Đã giải mã & lưu ${filename}`);
+          await new Promise(r => setTimeout(r, 600));
+        } catch (err) {
+          addBatchLog(`❌ Tập ${epIdx} lỗi: ${err.message}`);
+        }
+      }
+
+      statusText.textContent = batchAborted ? "Đã tạm dừng tải hàng loạt" : `🎉 Hoàn tất tải ${completed}/${total} tập!`;
+      document.getElementById("btn-start-batch").classList.remove("hidden");
+      document.getElementById("btn-stop-batch").classList.add("hidden");
+    }
+
+    function stopBatchDownload() {
+      batchAborted = true;
+      showToast("Đang dừng hàng đợi tải hàng loạt...");
+    }
+
+    // ==================== DOUYIN / TIKTOK RENDERER ====================
+    function renderDouyinResult(data) {
+      document.getElementById("search-results-wrapper").classList.add("hidden");
+      document.getElementById("series-result-wrapper").classList.add("hidden");
+
+      document.getElementById("dy-avatar").src = proxyImg(data.author?.avatar);
+      document.getElementById("dy-author").textContent = data.author?.name || "Douyin User";
+      document.getElementById("dy-provider").textContent = `Nguồn: ${data.provider}`;
+      document.getElementById("dy-title").textContent = data.title || "";
+
+      const box = document.getElementById("dy-media-box");
+      if (data.video) {
+        box.innerHTML = `
+          <div class="aspect-[9/16] max-h-[380px] mx-auto bg-black rounded-xl overflow-hidden border border-slate-700">
+            <video src="${data.video.stream_url}" controls playsinline class="w-full h-full object-contain"></video>
+          </div>
+          <div class="space-y-3">
+            <a href="${data.video.download_url}" class="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-cyan-400 to-rose-500 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg">
+              <i class="fas fa-download"></i> Tải Video Không Logo (MP4)
+            </a>
+            ${data.music?.download_url ? `
+              <a href="${data.music.download_url}" class="w-full py-3 px-5 rounded-xl bg-slate-900 hover:bg-slate-700 text-slate-200 font-semibold text-xs flex items-center justify-center gap-2 border border-slate-700">
+                <i class="fas fa-music text-rose-400"></i> Tải Nhạc Nền MP3
+              </a>
+            ` : ""}
+          </div>
+        `;
+      }
+      const wrap = document.getElementById("douyin-result-wrapper");
+      wrap.classList.remove("hidden");
+      wrap.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // ==================== KHÁM PHÁ PHIM NGẮN THỊNH HÀNH (DISCOVER) ====================
+    async function loadDiscoverCategory(cat, page = 1, btnEl = null) {
+      currentDiscoverCategory = cat;
+      currentDiscoverPage = Math.max(1, page);
+
+      if (btnEl) {
+        document.querySelectorAll(".discover-tab").forEach(b => {
+          b.className = "discover-tab px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition";
+        });
+        btnEl.className = "discover-tab active px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500 text-white shadow transition";
+      }
+
+      const grid = document.getElementById("discover-grid");
+      grid.innerHTML = `
+        <div class="col-span-full py-10 text-center text-slate-400 text-xs">
+          <i class="fas fa-circle-notch fa-spin text-rose-500 text-xl mb-2"></i>
+          <p>Đang đồng bộ danh sách phim ngắn từ Hongguo (${cat} - trang ${currentDiscoverPage})...</p>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(`/api/discover?category=${encodeURIComponent(cat)}&page=${currentDiscoverPage}`);
+        const json = await res.json();
+        const list = json.data?.list || [];
+
+        if (list.length === 0) {
+          grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-xs">Không có dữ liệu ở trang này.</div>`;
+        } else {
+          grid.innerHTML = list.slice(0, 18).map(item => createDramaCardHtml(item)).join("");
+        }
+
+        document.getElementById("disc-page-indicator").textContent = `Trang ${currentDiscoverPage}`;
+        document.getElementById("btn-disc-prev").disabled = currentDiscoverPage <= 1;
+      } catch (e) {
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-rose-400 text-xs">Không thể tải danh sách khám phá: ${e.message}</div>`;
+      }
+    }
+
+    function changeDiscoverPage(delta) {
+      loadDiscoverCategory(currentDiscoverCategory, currentDiscoverPage + delta);
+    }
+
+    // ==================== BÀI VIẾT CHUYÊN SÂU & PHÁP LÝ (ADSENSE READY) ====================
+    function renderArticlesSection() {
+      const articles = window.HONGGUO_ARTICLES || [];
+      if (!articles.length) return;
+
+      const grid = document.getElementById("articles-grid");
+      grid.innerHTML = articles.map(art => `
+        <div onclick="openArticle('${art.id}')" class="cursor-pointer group bg-slate-800/75 hover:bg-slate-800 border border-slate-700/80 hover:border-rose-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all shadow-lg">
+          <div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-3">
+              <span class="px-2.5 py-0.5 rounded-full font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">${art.category}</span>
+              <span><i class="regular fa-clock mr-1"></i>${art.readTime}</span>
+            </div>
+            <h3 class="text-base font-bold text-white group-hover:text-rose-400 transition-colors mb-2 leading-snug">${art.title}</h3>
+            <p class="text-xs text-slate-400 leading-relaxed clamp-3">${art.excerpt}</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs">
+            <span class="text-slate-400">${art.date}</span>
+            <span class="font-bold text-rose-400 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+              Đọc toàn bộ <i class="fas fa-arrow-right text-[10px]"></i>
+            </span>
+          </div>
+        </div>
+      `).join("");
+
+      // Mặc định mở bài viết đầu tiên để nội dung luôn hiển thị đầy đủ trên DOM cho Googlebot / AdSense
+      openArticle(articles[0].id, false);
+    }
+
+    function openArticle(articleId, shouldScroll = true) {
+      const articles = window.HONGGUO_ARTICLES || [];
+      const art = articles.find(a => a.id === articleId) || articles[0];
+      if (!art) return;
+
+      document.getElementById("reader-category").textContent = art.category;
+      document.getElementById("reader-meta").textContent = `${art.date} · ${art.readTime}`;
+      document.getElementById("reader-author").textContent = art.author;
+      document.getElementById("reader-title").textContent = art.title;
+      document.getElementById("reader-body").innerHTML = art.content;
+
+      if (shouldScroll) {
+        document.getElementById("article-reader-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function openLegalModal(key) {
+      const page = (window.HONGGUO_LEGAL_PAGES || {})[key];
+      if (!page) return;
+      document.getElementById("legal-modal-title").textContent = page.title;
+      document.getElementById("legal-modal-body").innerHTML = page.content;
+      document.getElementById("legal-modal").classList.remove("hidden");
+    }
+
+    function closeLegalModal() {
+      document.getElementById("legal-modal").classList.add("hidden");
+    }
+
+    window.handleContactSubmit = function (form) {
+      form.reset();
+      closeLegalModal();
+      showToast("Đã gửi tin nhắn thành công! Chúng tôi sẽ phản hồi sớm nhất.");
+    };
+
+    // ==================== LỊCH SỬ TRA CỨU CỤC BỘ ====================
+    function saveToHistory(seriesData) {
+      if (!seriesData || !seriesData.series_id) return;
+      try {
+        let hist = JSON.parse(localStorage.getItem("hg_history") || "[]");
+        hist = hist.filter(h => h.series_id !== seriesData.series_id);
+        hist.unshift({
+          series_id: seriesData.series_id,
+          title: seriesData.title,
+          cover: seriesData.cover,
+          total_episodes: seriesData.total_episodes,
+          time: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
+        });
+        localStorage.setItem("hg_history", JSON.stringify(hist.slice(0, 8)));
+        renderHistory();
+      } catch {}
+    }
+
+    function renderHistory() {
+      const el = document.getElementById("history-list");
+      try {
+        const hist = JSON.parse(localStorage.getItem("hg_history") || "[]");
+        if (!hist.length) {
+          el.innerHTML = `<p class="text-xs text-slate-400 col-span-full">Chưa có bộ phim nào trong lịch sử phiên làm việc.</p>`;
+          return;
+        }
+        el.innerHTML = hist.map(h => `
+          <div onclick="openSeriesById('${h.series_id}')" class="cursor-pointer flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-900 border border-slate-700/80 hover:border-rose-500/40 transition">
+            <img src="${proxyImg(h.cover)}" alt="${h.title}" class="w-11 h-14 rounded-lg object-cover flex-shrink-0" onerror="this.src='/favicon.svg'" />
+            <div class="min-w-0 flex-1">
+              <h4 class="text-xs font-bold text-white truncate">${h.title}</h4>
+              <p class="text-[11px] text-amber-400 mt-0.5">Trọn bộ ${h.total_episodes || "?"} tập</p>
+              <span class="text-[10px] text-slate-500 font-mono">ID: ${h.series_id.slice(0, 10)}...</span>
+            </div>
+          </div>
+        `).join("");
+      } catch {}
+    }
+
+    function clearHistory() {
+      localStorage.removeItem("hg_history");
+      renderHistory();
+      showToast("Đã xóa lịch sử tra cứu!");
+    }
+
+    // ==================== CÀI ĐẶT, GIAO DIỆN & ĐA NGÔN NGỮ ====================
+    function initTheme() {
+      const saved = localStorage.getItem("hg_theme") || "dark";
+      document.documentElement.classList.toggle("dark", saved === "dark");
+      document.getElementById("theme-icon").className = saved === "dark" ? "fas fa-moon text-sm" : "fas fa-sun text-amber-400 text-sm";
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("hg_theme", isDark ? "dark" : "light");
+      document.getElementById("theme-icon").className = isDark ? "fas fa-moon text-sm" : "fas fa-sun text-amber-400 text-sm";
+    }
+
+    function initSettings() {
+      const route = localStorage.getItem("hg_route") || "auto";
+      document.getElementById("route-select").value = route;
+      document.getElementById("setting-decrypt-mode").value = localStorage.getItem("hg_decrypt_mode") || "client";
+      document.getElementById("setting-custom-api").value = localStorage.getItem("hg_custom_api") || "";
+      document.getElementById("setting-apihz-id").value = localStorage.getItem("hg_apihz_id") || "";
+      document.getElementById("setting-apihz-key").value = localStorage.getItem("hg_apihz_key") || "";
+    }
+
+    function saveSelectedRoute(val) {
+      localStorage.setItem("hg_route", val);
+    }
+
+    function toggleSettingsModal(show) {
+      document.getElementById("settings-modal").classList.toggle("hidden", !show);
+    }
+
+    function saveSettings() {
+      localStorage.setItem("hg_decrypt_mode", document.getElementById("setting-decrypt-mode").value);
+      localStorage.setItem("hg_custom_api", document.getElementById("setting-custom-api").value.trim());
+      localStorage.setItem("hg_apihz_id", document.getElementById("setting-apihz-id").value.trim());
+      localStorage.setItem("hg_apihz_key", document.getElementById("setting-apihz-key").value.trim());
+      toggleSettingsModal(false);
+      showToast("Đã lưu cấu hình thành công!");
+    }
+
+    function initCookieBanner() {
+      if (!localStorage.getItem("hg_cookie_accepted")) {
+        document.getElementById("cookie-banner").classList.remove("hidden");
+      }
+    }
+
+    function acceptCookies() {
+      localStorage.setItem("hg_cookie_accepted", "1");
+      document.getElementById("cookie-banner").classList.add("hidden");
+    }
+
+    const I18N_DICT = {
+      vi: {
+        hero1: "Tìm Kiếm & Tải Video",
+        hero2: "Hongguo Short Drama",
+        desc: "Hỗ trợ dán link chia sẻ 红果免费短剧 (novelquickapp.com / hongguoduanju.com), mã series_id, tìm kiếm trực tiếp theo tên bộ phim hoặc tải video Douyin/TikTok. Tự động giải mã CENC-AES-CTR xuất file MP4 Full HD 1080p không logo.",
+        btnFetch: "Phân Tích & Tải",
+        placeholder: "Dán link Hongguo (novelquickapp.com/s/...), mã series_id (7503745441910017049) hoặc nhập tên phim (ví dụ: 总裁)..."
+      },
+      en: {
+        hero1: "Search & Download",
+        hero2: "Hongguo Short Drama",
+        desc: "Paste any Hongguo share link (novelquickapp.com / hongguoduanju.com), series_id, search by drama title, or download Douyin/TikTok videos. Built-in CENC-AES-CTR decryption exports clean 1080p Full HD MP4 without watermark.",
+        btnFetch: "Parse & Download",
+        placeholder: "Paste Hongguo link (novelquickapp.com/s/...), series_id (7503745441910017049), or search keyword (e.g. 总裁)..."
+      },
+      zh: {
+        hero1: "全能搜索与无水印下载",
+        hero2: "红果免费短剧 1080P",
+        desc: "支持粘贴红果短剧分享链接 (novelquickapp.com / hongguoduanju.com)、剧集 series_id、输入剧名直接搜索，内置 spade_a 密钥派生与 CENC-AES-CTR 流式解密，直接导出 1080P 原画 MP4。",
+        btnFetch: "立即解析下载",
+        placeholder: "粘贴红果分享链接、输入纯数字 series_id 或直接输入短剧名称搜索（如：总裁、重生）..."
+      }
+    };
+
+    function changeLanguage(lang) {
+      const d = I18N_DICT[lang] || I18N_DICT.vi;
+      document.getElementById("hero-title-1").textContent = d.hero1;
+      document.getElementById("hero-title-2").textContent = d.hero2;
+      document.getElementById("hero-desc").textContent = d.desc;
+      document.getElementById("btn-fetch-text").textContent = d.btnFetch;
+      document.getElementById("url-input").placeholder = d.placeholder;
+    }
+  </script>
+</body>
+</html>

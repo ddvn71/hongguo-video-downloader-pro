@@ -1,0 +1,27 @@
+{
+  "name": "hongguo-hub-pro",
+  "version": "2.0.0",
+  "description": "Hongguo Short Drama (红果免费短剧 / Fanqie) & Douyin/TikTok Video Downloader with Multi-Provider API Rotation & WebCrypto CENC-AES-128-CTR Decryption - Cloudflare Free & Render.com Ready",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "deploy:pages": "npx wrangler pages deploy public --project-name hongguo-hub-pro",
+    "deploy:worker": "npx wrangler deploy"
+  },
+  "keywords": [
+    "hongguo",
+    "hongguoduanju",
+    "fanqie-short-drama",
+    "novelquickapp",
+    "cenc-decrypt",
+    "spade-a",
+    "douyin",
+    "tiktok",
+    "cloudflare-pages",
+    "cloudflare-workers",
+    "render-python"
+  ],
+  "author": "HongguoHub Research Team",
+  "license": "MIT"
+}

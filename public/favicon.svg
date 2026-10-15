@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="hgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2E4C" />
+      <stop offset="55%" stop-color="#FF6B2B" />
+      <stop offset="100%" stop-color="#FFB800" />
+    </linearGradient>
+    <linearGradient id="innerGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#FFE4E8" stop-opacity="0.85" />
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="108" height="108" rx="28" fill="url(#hgGrad)" />
+  <rect x="12" y="12" width="96" height="96" rx="22" fill="#0F172A" fill-opacity="0.88" />
+  <!-- Stylized Berry / Leaf + Play & Download Arrow -->
+  <path d="M60 22C66 16 76 16 80 22C74 26 65 26 60 22Z" fill="#22C55E" />
+  <path d="M42 36C42 32.6863 44.6863 30 48 30H72C75.3137 30 78 32.6863 78 36V62C78 74.1503 68.1503 84 56 84H64C51.8497 84 42 74.1503 42 62V36Z" fill="url(#hgGrad)" fill-opacity="0.2" />
+  <path d="M48 40L74 55L48 70V40Z" fill="url(#hgGrad)" />
+  <path d="M60 58V86M60 86L49 75M60 86L71 75" stroke="url(#innerGlow)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M40 94H80" stroke="url(#hgGrad)" stroke-width="5" stroke-linecap="round" />
+</svg>

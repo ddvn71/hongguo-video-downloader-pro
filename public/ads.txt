@@ -1,0 +1,3 @@
+# Google AdSense Authorized Digital Sellers (ads.txt)
+# Thay thế pub-0000000000000000 bằng Publisher ID thật của bạn khi đăng ký Google AdSense
+google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Cloudflare & Wrangler
+.wrangler/
+.dev.vars
+
+# Environment & OS
+.env
+.env.local
+.DS_Store
+Thumbs.db
+*.log
