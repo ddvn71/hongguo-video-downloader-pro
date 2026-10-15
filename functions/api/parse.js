@@ -24,10 +24,10 @@ const DEFAULT_APIHZ_POOL = [
 
 // Ưu tiên IP tuyến quốc tế 101.35.2.25 (phản hồi ~400ms, tránh timeout từ cn.apihz.cn)
 const APIHZ_ROUTES = [
+  "https://cn.apihz.cn/api/fun/douyin.php",
   "http://101.35.2.25/api/fun/douyin.php",
   "http://124.222.204.22/api/fun/douyin.php",
-  "http://124.220.49.230/api/fun/douyin.php",
-  "https://cn.apihz.cn/api/fun/douyin.php"
+  "http://124.220.49.230/api/fun/douyin.php"
 ];
 
 let apihzPoolCursor = 0;
@@ -341,14 +341,14 @@ export async function onRequest(context) {
           );
           parsed = r;
         } else {
-          // Với link Douyin: Ưu tiên Native SSR (0đ, không giới hạn) + Đua song song với Apihz IP quốc tế (101.35.2.25) & TikWM
+          // Với link Douyin: Gọi Apihz (cn.apihz.cn) làm nguồn chính, hedge 1200ms kích hoạt TikWM / Native SSR
           const tasks = [];
-          if (awemeId) tasks.push(() => parseWithDouyinNative(awemeId));
           tasks.push(() => parseWithApihz(target.url, cred.id, cred.key, 0));
           tasks.push(() => parseWithTikWM(target.url));
+          if (awemeId) tasks.push(() => parseWithDouyinNative(awemeId));
 
           const [primaryTask, ...backupTasks] = tasks;
-          const { result: r } = await raceWithHedge(primaryTask, backupTasks, 350);
+          const { result: r } = await raceWithHedge(primaryTask, backupTasks, 1200);
           parsed = r;
         }
 

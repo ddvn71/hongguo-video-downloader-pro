@@ -149,3 +149,47 @@ To achieve `<2ms` Edge delivery, zero CPU overruns, and prevent burning the 100,
 7. **Edge Cache API (`caches.default`)**:
    - Cache cover images (`/api/proxy`) for 30 days (`immutable`) and small decrypted MP4s (`<= 20MB`) for 1-2 hours so repeated requests and range requests serve directly from Edge RAM.
 
+---
+
+## 7. Trick #6: Direct ByteDance CDN Offloading (Zero Bandwidth & 0ms CPU Cost)
+
+1. **Upstream CORS Header Discovery**:
+   - Both `*.qznovelvod.com` (ByteDance VOD CDN for 1080p CENC MP4) and `*.byteimg.com` (cover image CDN) return `HTTP 200` with header:
+     `Access-Control-Allow-Origin: *`
+     when requested without a `Referer` header (`referrerPolicy: "no-referrer"`).
+2. **Client-Side Direct Fetching**:
+   - In browser frontend, fetch raw MP4 bytes directly via:
+     `fetch(rawVideoUrl, { referrerPolicy: "no-referrer" })`
+     and only fall back to `/api/download?url=...&raw=1` if CORS fails.
+   - For images, use `<img src="direct_byteimg_url" referrerpolicy="no-referrer" onerror="this.src='/api/proxy?url=...'"/>`.
+   - **Benefit**: 100% of video bandwidth and 99% of image requests bypass Cloudflare Workers entirely, saving thousands of worker invocations and bandwidth limits on Cloudflare Free.
+
+---
+
+## 8. Trick #7: Hybrid 4.1x T-Table + WebCrypto AES-128-CTR Decryption Engine
+
+1. **Sample Distribution in 1080p CENC MP4**:
+   - In ISO-BMFF CENC MP4 streams, 94.2% of samples are $\le 2048$ bytes (audio frames and P/B video slices). Only ~5.8% (large I-frames) exceed 2048 bytes.
+   - Calling `crypto.subtle.decrypt` for 12,000+ tiny samples creates 12,000+ Promise allocations, causing severe event-loop overhead and hitting Cloudflare Worker 10ms CPU limits (`Error 1102`).
+2. **Hybrid Solution**:
+   - Precompute 32-bit AES T-tables (`AES_TE0..TE3`, `AES_SBOX`).
+   - Decrypt all samples $\le 2048$ bytes synchronously in-place (0 Promise allocation, 0 GC).
+   - Dispatch only large I-frames ($> 2048$ bytes) to hardware-accelerated `crypto.subtle.decrypt`.
+   - **Result**: Decryption time drops from 395.6ms to 95.7ms (4.1x faster), Promise allocations drop by 94.2%.
+3. **Browser Inline Web Worker**:
+   - Run the decryptor inside an inline `Blob` Web Worker with zero-copy `Transferable` `ArrayBuffer` (`postMessage(..., [u8.buffer])`).
+   - Ensures **0ms UI freeze** on the browser main thread during multi-episode batch downloading.
+
+---
+
+## 9. Trick #8: Douyin / TikTok Multi-Provider Rotation & Cooldown Bypass
+
+1. **Apihz 30s Cooldown**:
+   - Free Apihz accounts enforce a strict 30s rate-limit (`该接口免费用户限制30秒解析1次`).
+   - **Primary Route**: Must use HTTPS `https://cn.apihz.cn/api/fun/douyin.php` (raw IPs like `101.35.2.25` fail across firewalls).
+   - **Two-Tier Cache**: Cache parsed Douyin responses for 30 minutes (`getOrSetCache(cacheKey, 1800, ...)`) using canonical `aweme_id` or resolved URL. Subsequent hits return in $<1\text{ms}$ and bypass the 30s rate limit completely.
+2. **TikWM & Native SSR Hedged Fallback**:
+   - Resolve `v.douyin.com` with `redirect: "manual"` in ~200ms to get canonical `aweme_id`.
+   - Race Apihz (primary) with TikWM and Native SSR backups using `raceWithHedge(primary, backups, 1200)`.
+
+

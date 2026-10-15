@@ -80,6 +80,7 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({
         success: true,
         mode: "batch",
+        count: Object.keys(outMap).length,
         data_map: outMap
       }), {
         status: 200,

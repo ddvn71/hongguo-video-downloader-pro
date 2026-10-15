@@ -1115,6 +1115,7 @@ function formatSeriesCard(item) {
 
   return {
     series_id: sid,
+    book_id: sid,
     title,
     cover,
     episode_cnt: episodeCnt,
