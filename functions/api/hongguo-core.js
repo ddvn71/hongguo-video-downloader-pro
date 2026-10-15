@@ -295,7 +295,7 @@ export async function raceWithHedge(primaryFn, backupFns = [], hedgeDelayMs = 11
         errors.push(err?.message || String(err));
         failedCount++;
         clearTimeout(hedgeTimer);
-        if (backupFns.length === 0) {
+        if (failedCount >= total) {
           reject(new Error(errors.join(" | ")));
         } else {
           triggerBackups();
@@ -1183,7 +1183,7 @@ export async function discoverHongguoDramas(category = "hot", page = 1) {
   const { value } = await getOrSetCache(`discover:${category}:${page}`, 600, async () => {
     let targetUrl = `${HONGGUO_WEB_ORIGIN}/category`;
     if (category === "hot") {
-      targetUrl = page > 1 ? `${HONGGUO_WEB_ORIGIN}/category?sort_type=1&page=${page}` : `${HONGGUO_WEB_ORIGIN}/`;
+      targetUrl = `${HONGGUO_WEB_ORIGIN}/category?sort_type=1${page > 1 ? `&page=${page}` : ""}`;
     } else if (category === "latest") {
       targetUrl = `${HONGGUO_WEB_ORIGIN}/category?sort_type=2${page > 1 ? `&page=${page}` : ""}`;
     } else if (["real-drama", "comic-drama", "ai-drama"].includes(category)) {

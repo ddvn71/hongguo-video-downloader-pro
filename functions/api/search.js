@@ -100,7 +100,10 @@ export async function onRequest(context) {
       success: true,
       mode: "discover",
       latency_ms: elapsed,
-      data: discoverData
+      data: {
+        ...discoverData,
+        results: discoverData.list || []
+      }
     }), {
       status: 200,
       headers: {

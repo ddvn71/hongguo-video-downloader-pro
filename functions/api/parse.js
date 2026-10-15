@@ -218,7 +218,7 @@ async function parseWithTikWM(url, timeoutMs = 6500) {
   throw new Error(data.msg || "TikWM parse failed");
 }
 
-async function parseWithApihz(url, id, key, routeIndex = 0, timeoutMs = 6000) {
+async function parseWithApihz(url, id, key, routeIndex = 0, timeoutMs = 18000) {
   const targetRoute = APIHZ_ROUTES[routeIndex] || APIHZ_ROUTES[0];
   const apiUrl = `${targetRoute}?id=${encodeURIComponent(id)}&key=${encodeURIComponent(key)}&url=${encodeURIComponent(url)}`;
   const res = await fetchWithTimeout(apiUrl, {
@@ -329,7 +329,7 @@ export async function onRequest(context) {
       const { awemeId } = isTikTok ? { awemeId: "" } : await resolveDouyinCanonicalId(target.url);
       const cacheKey = `douyin:${awemeId || target.url}`;
 
-      const { value: result, cached } = await getOrSetCache(cacheKey, 1800, async () => {
+      const cacheRes = await getOrSetCache(cacheKey, 1800, async () => {
         const cred = pickApihzCredential(apihzId, apihzKey, env?.APIHZ_POOL);
         let parsed = null;
 
@@ -341,14 +341,14 @@ export async function onRequest(context) {
           );
           parsed = r;
         } else {
-          // Với link Douyin: Gọi Apihz (cn.apihz.cn) làm nguồn chính, hedge 1200ms kích hoạt TikWM / Native SSR
+          // Với link Douyin: Gọi Apihz (cn.apihz.cn) làm nguồn chính, hedge 1500ms kích hoạt TikWM / Native SSR
           const tasks = [];
-          tasks.push(() => parseWithApihz(target.url, cred.id, cred.key, 0));
+          tasks.push(() => parseWithApihz(target.url, cred.id, cred.key, 0, 15000));
           tasks.push(() => parseWithTikWM(target.url));
           if (awemeId) tasks.push(() => parseWithDouyinNative(awemeId));
 
           const [primaryTask, ...backupTasks] = tasks;
-          const { result: r } = await raceWithHedge(primaryTask, backupTasks, 1200);
+          const { result: r } = await raceWithHedge(primaryTask, backupTasks, 1500);
           parsed = r;
         }
 
@@ -362,12 +362,23 @@ export async function onRequest(context) {
         return parsed;
       }).catch(err => ({ value: null, errorMsg: err.message }));
 
+      const result = cacheRes?.value;
+      const cached = cacheRes?.cached;
+      const errorMsg = cacheRes?.errorMsg || "";
+
       if (!result) {
+        let userMsg = "Không thể phân tích link Douyin/TikTok này. Vui lòng thử lại sau ít giây.";
+        if (errorMsg.includes("30秒") || errorMsg.includes("30s")) {
+          userMsg = "Tài khoản Apihz miễn phí giới hạn 30 giây/lần. Vui lòng đợi 30 giây rồi thử lại, hoặc thêm Apihz ID & Key riêng trong mục Cài đặt.";
+        } else if (errorMsg) {
+          userMsg = `Lỗi phân tích Douyin: ${errorMsg}`;
+        }
         return new Response(JSON.stringify({
           success: false,
-          message: "Không thể phân tích link Douyin/TikTok này. Vui lòng thử lại sau ít giây."
+          message: userMsg,
+          raw_error: errorMsg
         }), {
-          status: 502,
+          status: 429,
           headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
         });
       }
