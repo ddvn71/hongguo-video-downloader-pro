@@ -1,4 +1,4 @@
-// Local development & Node.js production server (Render / VPS / Localhost)
+// Local development & Node.js server (Render.com / Localhost)
 // Sử dụng trực tiếp các Cloudflare Pages Functions trong ./functions/api/* để đồng bộ 100% logic
 // Chạy: node server.js -> Mở http://localhost:3000
 
