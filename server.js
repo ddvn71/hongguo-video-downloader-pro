@@ -2,37 +2,37 @@
 // Sử dụng trực tiếp các Cloudflare Pages Functions trong ./functions/api/* để đồng bộ 100% logic
 // Chạy: node server.js -> Mở http://localhost:3000
 
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
-const { URL } = require("url");
-const { pathToFileURL } = require("url");
+import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
+import zlib from "node:zlib";
+import { URL, fileURLToPath } from "node:url";
+
+import { onRequest as parseHandler } from "./functions/api/parse.js";
+import { onRequest as episodeHandler } from "./functions/api/episode.js";
+import { onRequest as searchHandler } from "./functions/api/search.js";
+import { onRequest as videoHandler } from "./functions/api/video.js";
+import { onRequest as downloadHandler } from "./functions/api/download.js";
+import { onRequest as proxyHandler } from "./functions/api/proxy.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, "public");
 
-let handlersPromise = null;
-async function getHandlers() {
-  if (!handlersPromise) {
-    handlersPromise = Promise.all([
-      import(pathToFileURL(path.join(__dirname, "functions/api/parse.js")).href),
-      import(pathToFileURL(path.join(__dirname, "functions/api/episode.js")).href),
-      import(pathToFileURL(path.join(__dirname, "functions/api/search.js")).href),
-      import(pathToFileURL(path.join(__dirname, "functions/api/video.js")).href),
-      import(pathToFileURL(path.join(__dirname, "functions/api/download.js")).href),
-      import(pathToFileURL(path.join(__dirname, "functions/api/proxy.js")).href)
-    ]).then(([parseMod, epMod, searchMod, videoMod, dlMod, proxyMod]) => ({
-      "/api/parse": parseMod.onRequest,
-      "/api/episode": epMod.onRequest,
-      "/api/search": searchMod.onRequest,
-      "/api/discover": searchMod.onRequest,
-      "/api/video": videoMod.onRequest,
-      "/api/download": dlMod.onRequest,
-      "/api/proxy": proxyMod.onRequest
-    }));
-  }
-  return handlersPromise;
-}
+const HANDLERS = {
+  "/api/parse": parseHandler,
+  "/api/episode": episodeHandler,
+  "/api/search": searchHandler,
+  "/api/discover": searchHandler,
+  "/api/video": videoHandler,
+  "/api/download": downloadHandler,
+  "/api/proxy": proxyHandler
+};
+
+// In-memory cache cho static files để tăng tốc độ phản hồi <1ms
+const staticCache = new Map();
 
 function readRequestBody(req) {
   return new Promise((resolve, reject) => {
@@ -51,8 +51,7 @@ const server = http.createServer(async (req, res) => {
   // Định tuyến API qua Cloudflare Functions handlers
   if (pathname.startsWith("/api/")) {
     try {
-      const handlers = await getHandlers();
-      const handler = handlers[pathname];
+      const handler = HANDLERS[pathname];
       if (!handler) {
         res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" });
         res.end(JSON.stringify({ success: false, message: `API route not found: ${pathname}` }));
@@ -73,7 +72,11 @@ const server = http.createServer(async (req, res) => {
         body: hasBody && bodyBuf && bodyBuf.length > 0 ? bodyBuf : undefined
       });
 
-      const webResp = await handler({ request: webReq, env: process.env, ctx: {} });
+      const webResp = await handler({
+        request: webReq,
+        env: process.env,
+        ctx: { waitUntil: p => Promise.resolve(p).catch(() => {}) }
+      });
 
       const respHeaders = {};
       webResp.headers.forEach((val, key) => {
@@ -100,7 +103,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Phục vụ Static Files từ thư mục public/
+  // Phục vụ Static Files từ thư mục public/ (kèm nén Gzip tự động)
   let filePath = path.join(PUBLIC_DIR, pathname === "/" ? "index.html" : pathname);
   const ext = path.extname(filePath).toLowerCase();
   const mimeTypes = {
@@ -116,6 +119,29 @@ const server = http.createServer(async (req, res) => {
     ".ico": "image/x-icon"
   };
 
+  const serveContent = (content, contentType) => {
+    const acceptEncoding = String(req.headers["accept-encoding"] || "");
+    const compressible = /\.(html|js|css|json|xml|svg|txt)$/i.test(ext || ".html");
+    if (compressible && acceptEncoding.includes("gzip") && content.length > 1024) {
+      zlib.gzip(content, (gzErr, gzBuf) => {
+        if (!gzErr) {
+          res.writeHead(200, {
+            "Content-Type": contentType,
+            "Content-Encoding": "gzip",
+            "Vary": "Accept-Encoding"
+          });
+          res.end(gzBuf);
+        } else {
+          res.writeHead(200, { "Content-Type": contentType });
+          res.end(content);
+        }
+      });
+    } else {
+      res.writeHead(200, { "Content-Type": contentType });
+      res.end(content);
+    }
+  };
+
   fs.readFile(filePath, (err, content) => {
     if (err) {
       if (err.code === "ENOENT") {
@@ -124,8 +150,7 @@ const server = http.createServer(async (req, res) => {
             res.writeHead(404);
             res.end("404 Not Found");
           } else {
-            res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-            res.end(content2);
+            serveContent(content2, "text/html; charset=utf-8");
           }
         });
       } else {
@@ -133,8 +158,7 @@ const server = http.createServer(async (req, res) => {
         res.end(`Server Error: ${err.code}`);
       }
     } else {
-      res.writeHead(200, { "Content-Type": mimeTypes[ext] || "application/octet-stream" });
-      res.end(content);
+      serveContent(content, mimeTypes[ext] || "application/octet-stream");
     }
   });
 });

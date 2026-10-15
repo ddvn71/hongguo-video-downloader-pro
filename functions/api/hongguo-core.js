@@ -96,6 +96,133 @@ export async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
   }
 }
 
+// ==================== BỘ NHỚ ĐỆM 2 TẦNG (IN-MEMORY LRU + CLOUDFLARE EDGE CACHE) ====================
+const MEM_CACHE = new Map();
+const MAX_MEM_CACHE_SIZE = 600;
+
+export function getMemCache(key) {
+  const entry = MEM_CACHE.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.exp) {
+    MEM_CACHE.delete(key);
+    return null;
+  }
+  // Làm mới vị trí LRU
+  MEM_CACHE.delete(key);
+  MEM_CACHE.set(key, entry);
+  return entry.val;
+}
+
+export function setMemCache(key, val, ttlSec = 900) {
+  if (MEM_CACHE.size >= MAX_MEM_CACHE_SIZE) {
+    const oldestKey = MEM_CACHE.keys().next().value;
+    if (oldestKey !== undefined) MEM_CACHE.delete(oldestKey);
+  }
+  MEM_CACHE.set(key, { val, exp: Date.now() + ttlSec * 1000 });
+  return val;
+}
+
+/**
+ * Lấy dữ liệu từ bộ nhớ đệm 2 tầng (Isolate RAM <1ms -> Cloudflare Edge Cache <5ms -> Fetcher)
+ * Tối ưu 100% hạn mức miễn phí của Cloudflare Workers & tăng tốc phản hồi tức thì
+ */
+export async function getOrSetCache(cacheKey, ttlSec, fetcherFn) {
+  const memHit = getMemCache(cacheKey);
+  if (memHit !== null) {
+    return { value: memHit, cached: "memory" };
+  }
+
+  const edgeCache = globalThis.caches?.default;
+  const edgeUrl = `https://edge-cache.internal/${encodeURIComponent(cacheKey)}`;
+  if (edgeCache) {
+    try {
+      const hit = await edgeCache.match(edgeUrl);
+      if (hit) {
+        const parsed = await hit.json();
+        setMemCache(cacheKey, parsed, ttlSec);
+        return { value: parsed, cached: "edge" };
+      }
+    } catch {}
+  }
+
+  const freshValue = await fetcherFn();
+  if (freshValue !== null && freshValue !== undefined) {
+    setMemCache(cacheKey, freshValue, ttlSec);
+    if (edgeCache) {
+      try {
+        const resp = new Response(JSON.stringify(freshValue), {
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": `public, max-age=${ttlSec}`
+          }
+        });
+        edgeCache.put(edgeUrl, resp).catch(() => {});
+      } catch {}
+    }
+  }
+  return { value: freshValue, cached: false };
+}
+
+/**
+ * Đua đa luồng có độ trễ bảo hiểm (Hedged Parallel Racing):
+ * - Gọi nguồn chính (primaryFn) ngay lập tức (chỉ tốn 1 request nếu nguồn chính nhanh < hedgeDelayMs).
+ * - Nếu sau hedgeDelayMs nguồn chính chưa xong hoặc lỗi, lập tức kích hoạt đồng thời các nguồn dự phòng (backupFns) bằng Promise.any.
+ */
+export async function raceWithHedge(primaryFn, backupFns = [], hedgeDelayMs = 1100) {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const errors = [];
+    const total = 1 + backupFns.length;
+    let failedCount = 0;
+    let backupsStarted = false;
+
+    const triggerBackups = () => {
+      if (backupsStarted || settled || backupFns.length === 0) return;
+      backupsStarted = true;
+      for (const fn of backupFns) {
+        Promise.resolve().then(fn).then(
+          res => {
+            if (!settled) {
+              settled = true;
+              clearTimeout(hedgeTimer);
+              resolve({ result: res, errors });
+            }
+          },
+          err => {
+            errors.push(err?.message || String(err));
+            failedCount++;
+            if (!settled && failedCount >= total) {
+              reject(new Error(errors.join(" | ")));
+            }
+          }
+        );
+      }
+    };
+
+    const hedgeTimer = setTimeout(triggerBackups, hedgeDelayMs);
+
+    Promise.resolve().then(primaryFn).then(
+      res => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(hedgeTimer);
+          resolve({ result: res, errors });
+        }
+      },
+      err => {
+        errors.push(err?.message || String(err));
+        failedCount++;
+        clearTimeout(hedgeTimer);
+        if (backupFns.length === 0) {
+          reject(new Error(errors.join(" | ")));
+        } else {
+          triggerBackups();
+        }
+      }
+    );
+  });
+}
+
 /**
  * Trích xuất đối tượng JSON từ chuỗi HTML (ví dụ: window._ROUTER_DATA = {...})
  */

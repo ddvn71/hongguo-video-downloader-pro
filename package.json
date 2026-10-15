@@ -2,6 +2,7 @@
   "name": "hongguo-hub-pro",
   "version": "2.0.0",
   "description": "Hongguo Short Drama (红果免费短剧 / Fanqie) & Douyin/TikTok Video Downloader with Multi-Provider API Rotation & WebCrypto CENC-AES-128-CTR Decryption - Cloudflare Free & Render.com Ready",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
